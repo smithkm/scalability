@@ -63,10 +63,10 @@ end
 
 @results.each { |group, result|
   error_rate = result.errors.to_f / result.samples
-  avg_loadtime = result.loadtime.to_f / result.samples
+  avg_loadtime = (result.loadtime.to_f / result.samples).to_i
   duration = result.end_time - result.start_time + avg_loadtime # close enough
-  throughput = result.samples / duration.to_f * 1000
-  data_rate = result.bytes.to_f / duration.to_f
+  throughput = "%.1f" % (result.samples / duration.to_f * 1000)
+  data_rate = "%.1f" % (result.bytes.to_f / duration.to_f)
   times = result.times.sort
   median = times[ times.size / 2 ] # close enough
   nintyperc = times[ times.size * 9 / 10 ] # close enough

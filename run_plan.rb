@@ -10,58 +10,25 @@ require 'rest-client'
 require 'json'
 require 'pp'
 
-@base_loops=6
-@ap_server="scale.dev.opengeo.org"
-@db_server="scale-db.dev.opengeo.org"
-@geoserver_user="admin"
-@geoserver_pass="geoserver"
-@geoserver_url="http://#{@ap_server}/geoserver"
-@rest_url="http://#{@geoserver_user}:#{@geoserver_pass}@#{@ap_server}/geoserver/rest"
-@out_dir="results"
+APP_SERVER="scale.dev.opengeo.org"
+DB_SERVER="scale-db.dev.opengeo.org"
+GEOSERVER_USER="admin"
+GEOSERVER_PASS="geoserver"
+GEOSERVER_URL="http://#{APP_SERVER}/geoserver"
+REST_URL="http://#{GEOSERVER_USER}:#{GEOSERVER_PASS}@#{APP_SERVER}/geoserver/rest"
+OUT_SUBDIR="results"
+BASE_CONF_FILE="base.conf"
 
-@tomcat_dir="/srv/tomcat"
-@tomcat_sh="#{@tomcat_dir}/tomcat.sh"
-@tomcat_start="#{@tomcat_dir}/set_local_node_count.sh"
-@tomcat_conf="#{@tomcat_dir}/tomcat_base/bin/setenv.sh"
-@data_dir="/var/lib/geoserver_data"
-
-# default configurations
-conf = Hash.new 
-conf["JVM"] = "jdk-1.6.0_37-x64"
-conf["JAVA_MEM"] = "-Xms128m -Xmx512m -XX:MaxPermSize=128m"
-conf["JAVA_GC"] = "UseParallelGC"
-conf["JAVA_EXTRA"] = ""
-conf["GLOBAL.featureTypeCacheSize"] = 0
-conf["GLOBAL.globalServices"] = "true" 
-conf["GLOBAL.xmlPostRequestLogBufferSize"] = 1024
-conf["JAI.allowInterpolation"] = "false"
-conf["JAI.recycling"] = "false"
-conf["JAI.tilePriority"] = 5
-conf["JAI.tileThreads"] = 7
-conf["JAI.memoryCapacity"] = 0.5
-conf["JAI.memoryThreshold"] = 0.75
-conf["JAI.imageIOCache"] = "false"
-conf["JAI.pngAcceleration"] = "false"
-conf["JAI.jpegAcceleration"] = "false"
-conf["JAI.allowNativeMosaic"] = "false"
-conf["COVERAGE_ACCESS.maxPoolSize"] = 5
-conf["COVERAGE_ACCESS.corePoolSize"] = 5
-conf["COVERAGE_ACCESS.keepAliveTime"] = 30000
-conf["COVERAGE_ACCESS.imageIOCacheThreshold"] = 10240
-conf["COVERAGE_ACCESS.queueType"] = "UNBOUNDED"
-conf["CONTAINER"] = "tomcat"
-conf["CONTROLFLOW"] = "false"
-conf["CONTROLFLOW.user"] = 6
-conf["CONTROLFLOW.timeout"] = 30
-conf["CONTROLFLOW.ows.gwc"] = 32
-conf["CONTROLFLOW.ows.global"] = 32
-conf["CONTROLFLOW.ows.wms.getmap"] = 32
-conf["LOGGING.level"] = "PRODUCTION_LOGGING"
+TOMCAT_DIR="/srv/tomcat"
+TOMCAT_SH="#{TOMCAT_DIR}/tomcat.sh"
+TOMCAT_START="#{TOMCAT_DIR}/set_local_node_count.sh"
+TOMCAT_CONF="#{TOMCAT_DIR}/tomcat_base/bin/setenv.sh"
+DATA_DIR="/var/lib/geoserver_data"
 
 # check if server is responsive
 def check_server(retries=20)
   until retries < 0
-    return true if Net::HTTP.get_response(URI.parse("#{@geoserver_url}/web/")).kind_of?(Net::HTTPSuccess)
+    return true if Net::HTTP.get_response(URI.parse("#{GEOSERVER_URL}/web/")).kind_of?(Net::HTTPSuccess)
     sleep 1
     retries -= 1
   end
@@ -72,18 +39,48 @@ end
 # start any necessary nodes (container dependent)
 def start_nodes(container, nodes)
   puts "Setting node count to #{nodes} using #{container} ..."
-  Net::SSH.start(@ap_server, container, :port => 7777 ) do |ssh|
+  Net::SSH.start(APP_SERVER, container, :port => 7777 ) do |ssh|
     case container
     when "tomcat"
-      ssh.exec!("#{@tomcat_start} #{nodes}")
+      ssh.exec!("#{TOMCAT_START} #{nodes}")
     else
       puts "unsupported CONTAINER"
       exit 1
     end
   end
 
-  # wait a bit for the nodes to come up
-  sleep 10 + nodes
+  unless @debug
+    # wait a bit for the nodes to come up
+    sleep 10 + nodes
+  end
+end
+
+
+# read all configurations from file
+def read_config(conf_file, conf)
+  line_no=0
+  File.open(conf_file).each do |line|
+    line_no += 1
+    line=line.strip
+    unless line[0,1] == '#' || line.empty?
+      vals=line.split(/=/, 2)
+      if vals.size != 2
+        puts "ERROR: bad config file #{conf_file} on line #{line_no}: #{line}"
+        exit 1
+      end
+      conf[vals[0]] = vals[1]
+    end
+  end
+end
+
+# -d indicated debugging, turn off certain elements
+if ARGV.include?("-d")
+  puts "DEBUG MODE"
+  @debug = true
+  BASE_LOOPS=5
+  ARGV.delete("-d")
+else
+  BASE_LOOPS=64
 end
 
 unless ARGV[0] && ARGV[1] && ARGV[2]
@@ -94,22 +91,12 @@ end
 
 pwd = Dir.pwd
 
-# read config file
+# set default configurations and read custom config file
+conf = Hash.new 
+read_config(BASE_CONF_FILE, conf)
 conf_file = "config/#{ARGV[0]}"
 if File.exists?(conf_file)
-  line_no=0
-  File.open(conf_file).each do |line|
-    line_no += 1
-    line=line.strip
-    unless line[0,1] == '#' || line.empty?
-      vals=line.split(/=/, 2)
-      if vals.size != 2
-        puts "ERROR: bad config file on line #{line_no}: #{line}"
-        exit 1
-      end
-      conf[vals[0]] = vals[1]
-    end
-  end
+  read_config(conf_file, conf)
 else
   puts "unable to find config file"
   exit 1
@@ -164,7 +151,7 @@ else
 end
 
 outname = Time.now.strftime("%Y%m%d-%H%M%S-#{ARGV[0]}-#{ARGV[1]}-#{ARGV[2]}")
-outdir = "#{pwd}/#{@out_dir}/#{outname}"
+outdir = "#{pwd}/#{OUT_SUBDIR}/#{outname}"
 FileUtils.mkdir_p(outdir)
 
 # write settings to output directory
@@ -174,37 +161,40 @@ conf.each { |key, val|
 }
 conf_list = conf_list.sort
 
-conf_html = "<br/>"
 File.open("#{outdir}/plan.txt", 'w') { |file|
   file.write("workspace=#{workspace}\n")
   file.write("test=#{test}\n")
   conf_list.each { |line|
     file.write("#{line}\n")
-    conf_html += "#{line}<br/>"
   }
 }
 
 # set up a tomcat container
 if conf["CONTAINER"] == "tomcat"
-  Net::SSH.start(@ap_server, "tomcat", :port => 7777 ) do |ssh|
-    puts "Shutting down running nodes ..."
-    ssh.exec!("pkill java")
-    sleep 10
+  Net::SSH.start(APP_SERVER, "tomcat", :port => 7777 ) do |ssh|
+    unless @debug
+      puts "Shutting down running nodes ..."
+      ssh.exec!("pkill java")
+      sleep 10
+    end
 
     puts "Setting JAVA options ..."
-    ssh.exec!("sed -i \"s/^JAVA_HOME=.*/JAVA_HOME=\\\"\\/usr\\/lib\\/jvm\\/#{conf["JVM"]}\\\"/\" #{@tomcat_sh}")
-    ssh.exec!("sed -i \"s/^JAVA_MEM=.*/JAVA_MEM=\\\"#{conf["JAVA_MEM"]}\\\"/\" #{@tomcat_conf}")
-    ssh.exec!("sed -i \"s/^JAVA_GC=.*/JAVA_GC=\\\"#{conf["JAVA_GC"]}\\\"/\" #{@tomcat_conf}")
-    ssh.exec!("sed -i \"s/^JAVA_EXTRA=.*/JAVA_EXTRA=\\\"#{conf["JAVA_EXTRA"]}\\\"/\" #{@tomcat_conf}")
-    ssh.exec!("sed -i \"s/^GEOSERVER_DIR=.*/GEOSERVER_DIR=\\\"\\/var\\/lib\\/geoserver_data\\/#{workspace}\\\"/\" #{@tomcat_conf}")
+    ssh.exec!("sed -i \"s/^JAVA_HOME=.*/JAVA_HOME=\\\"\\/usr\\/lib\\/jvm\\/#{conf["JVM"]}\\\"/\" #{TOMCAT_SH}")
+    ssh.exec!("sed -i \"s/^JAVA_MEM=.*/JAVA_MEM=\\\"#{conf["JAVA_MEM"]}\\\"/\" #{TOMCAT_CONF}")
+    ssh.exec!("sed -i \"s/^JAVA_GC=.*/JAVA_GC=\\\"#{conf["JAVA_GC"]}\\\"/\" #{TOMCAT_CONF}")
+    ssh.exec!("sed -i \"s/^JAVA_EXTRA=.*/JAVA_EXTRA=\\\"#{conf["JAVA_EXTRA"]}\\\"/\" #{TOMCAT_CONF}")
+    ssh.exec!("sed -i \"s/^GEOSERVER_DIR=.*/GEOSERVER_DIR=\\\"\\/var\\/lib\\/geoserver_data\\/#{workspace}\\\"/\" #{TOMCAT_CONF}")
   end
+else
+  puts "Unsupported container #{conf["CONTAINER"]} ... aborint"
+  exit 1
 end
 
 # generic config for all containers (container name must be same as user)
-Net::SSH.start(@ap_server, conf["CONTAINER"], :port => 7777 ) do |ssh|
+Net::SSH.start(APP_SERVER, conf["CONTAINER"], :port => 7777 ) do |ssh|
   # some configurations need to occur before any nodes are brought up
   # set up control flow
-  controlflow_conf="#{@data_dir}/#{workspace}/controlflow.properties"
+  controlflow_conf="#{DATA_DIR}/#{workspace}/controlflow.properties"
   ssh.exec!("rm #{controlflow_conf}")
   if conf["CONTROLFLOW"] == "true"
     puts "Turning on ControlFlow ..."
@@ -217,7 +207,7 @@ Net::SSH.start(@ap_server, conf["CONTAINER"], :port => 7777 ) do |ssh|
 
   # set logging
   puts "Set logging level ..."
-  log_conf="#{@data_dir}/#{workspace}/logging.xml"
+  log_conf="#{DATA_DIR}/#{workspace}/logging.xml"
   level = conf["LOGGING.level"]
   ssh.exec!("sed -i \"s/<level>.*<\\\/level>/<level>#{level}<\\\/level>/\" #{log_conf}")
 end
@@ -233,7 +223,7 @@ unless check_server
 end
 
 puts "Configuring initial settings ..."
-geoserver_settings = JSON.parse(RestClient.get("#{@rest_url}/settings.json"))
+geoserver_settings = JSON.parse(RestClient.get("#{REST_URL}/settings.json"))
 geoserver_global = geoserver_settings["global"]
 jai_settings = geoserver_global["jai"]
 coverageAccess_settings = geoserver_global["coverageAccess"]
@@ -246,11 +236,11 @@ conf.each { |key, val|
     coverageAccess_settings[key.gsub(/^COVERAGE_ACCESS./, '')] = val
   end
 }
-RestClient.put "#{@rest_url}/settings.json", geoserver_settings.to_json, :content_type => :json
+RestClient.put "#{REST_URL}/settings.json", geoserver_settings.to_json, :content_type => :json
 
 Dir.chdir("workspaces/#{workspace}")
 gnuplot_cmd_base  = "set size 1,1;"
-gnuplot_cmd_base += "set terminal png size 640,640;"
+gnuplot_cmd_base += "set terminal png size 760,640;"
 gnuplot_cmd_base += "set xrange[#{min_threads}:#{max_threads}];"
 gnuplot_cmd_base += "set xlabel 'Concurrent users';"
 gnuplot_cmd_base += "set ylabel 'Response time (ms)';"
@@ -259,7 +249,6 @@ gnuplot_cmd_all = "plot "
 
 # run the test for each number of nodes
 results_table = ""
-new_row=true
 node_cfg.each { |nodes|
   unless nodes == 1
     start_nodes(conf["CONTAINER"], nodes) 
@@ -269,7 +258,7 @@ node_cfg.each { |nodes|
   results="%02d_nodes.csv" % nodes
   until threads > max_threads
     # let the number of loops decrease slowly based on the number of threads
-    loops = (@base_loops / (threads ** (0.25))).to_i
+    loops = (BASE_LOOPS / (threads ** (0.25))).to_i
     puts "Starting test: workspace=#{workspace} test=#{test} nodes=#{nodes} threads=#{threads} loops=#{loops} ..."
 
     nodes_s = "%02d" % nodes
@@ -283,21 +272,13 @@ node_cfg.each { |nodes|
     threads *= 2
   end 
 
-  # build gnuplot commands
+  # build gnuplot command for individual and composite plots
   gnuplot_cmd = "'#{outdir}/#{results}' using 1:4 with linespoints title '#{nodes} node(s)'"
   gnuplot_cmd_all += "#{gnuplot_cmd},"
+
+  # plot this node's results
   system("echo \"#{gnuplot_cmd_base}; set output '#{outdir}/#{nodes_s}_nodes.png';plot #{gnuplot_cmd};\" | gnuplot")
   
-  if new_row
-    results_table += "<tr>"
-  end
-  results_table += "<td><a href=\"#{results}\">#{nodes} nodes</a><br/><a href=\"#{nodes_s}_nodes.png\"><img width=\"66%\" src=\"#{nodes_s}_nodes.png\"/></a></td>"
-  if new_row
-    new_row = false
-  else
-    results_table += "</tr>"
-    new_row = true
-  end
   puts "Results written to #{results} ..."
 }
 
@@ -311,7 +292,7 @@ Dir.glob("#{workspace_dir}/*.log").each { |file|
   FileUtils.mv(file, "#{outdir}/logs/")
 }
 
-# plot results
+# plot all data and save gnuplot commands
 gnuplot_cmd_all = gnuplot_cmd_base + "set output '#{outdir}/plot.png';" + gnuplot_cmd_all.chomp(",") + ";"
 system("echo \"#{gnuplot_cmd_all}\" | gnuplot")
 File.open("#{outdir}/logs/gnuplot.log", 'w') { |file|
@@ -319,10 +300,57 @@ File.open("#{outdir}/logs/gnuplot.log", 'w') { |file|
 }
 
 # create webpage from template
-#results_table += "</ul>"
+# build config in html
+conf_html = "<br/>"
+File.open("#{outdir}/plan.txt", 'w') { |file|
+  file.write("workspace=#{workspace}\n")
+  file.write("test=#{test}\n")
+  conf_list.each { |line|
+    file.write("#{line}\n")
+    conf_html += "#{line}<br/>"
+  }
+}
+
+# collect all results
+results_html  = ""
+node_cfg.each { |nodes|
+  nodes_s = "%02d" % nodes
+  results_html += "<h2>#{nodes_s} nodes</h2>\n"
+  results_html += "<a href=\"#{nodes_s}_nodes.csv\">csv data</a>\n"
+  results_html += "<table>\n"
+  results_html += "<tr>\n"
+  results_html += "<td>\n"
+  results_html += "<a href=\"#{nodes_s}_nodes.png\"><img width=\"240px\" src=\"#{nodes_s}_nodes.png\"/></a>"
+  results_html += "</td>\n"
+  results_html += "<td valign=\"top\">\n"
+  results_html += "<table>\n"
+  results_html += "<tr>\n"
+  results_html += "<td>Threads</td>\n"
+  results_html += "<td>Requests</td>\n"
+  results_html += "<td>Errors</td>\n"
+  results_html += "<td>Avgerage</td>\n"
+  results_html += "<td>Median</td>\n"
+  results_html += "<td>90 Percentile</td>\n"
+  results_html += "<td>Minimum</td>\n"
+  results_html += "<td>Maximum</td>\n"
+  results_html += "<td>Duration</td>\n"
+  results_html += "<td>Throughput</td>\n"
+  results_html += "<td>Data Rate</td>\n"
+  results_html += "</tr>\n"
+  File.open("#{outdir}/#{nodes_s}_nodes.csv", 'r').each { |line|
+    results_html += "<tr>\n<td>"
+    results_html += line.gsub(",","</td>\n<td>")
+    results_html += "</td>\n</tr>\n"
+  }
+  results_html += "</table>\n"
+  results_html += "</td>\n"
+  results_html += "</tr>\n"
+  results_html += "</table>\n"
+}
+
 File.open("#{outdir}/index.html", 'w') { |fout| 
   File.open("#{pwd}/index.html.template", "r").each_line do |line_in|
-    line_out = line_in.gsub("${name}", outname).gsub("${config}", conf_html).gsub("${results}", results_table).gsub("${workspace}", workspace).gsub("${test}", test).gsub("${setup}", conf_file)
+    line_out = line_in.gsub("${name}", outname).gsub("${config}", conf_html).gsub("${results}", results_html).gsub("${workspace}", workspace).gsub("${test}", test).gsub("${setup}", conf_file)
     fout.write(line_out) 
   end
 }
