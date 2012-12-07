@@ -240,7 +240,7 @@ RestClient.put "#{REST_URL}/settings.json", geoserver_settings.to_json, :content
 
 Dir.chdir("workspaces/#{workspace}")
 gnuplot_cmd_base  = "set size 1,1;"
-gnuplot_cmd_base += "set terminal png size 760,640;"
+gnuplot_cmd_base += "set terminal png size 760,640 nocrop enhanced;"
 gnuplot_cmd_base += "set xrange[#{min_threads}:#{max_threads}];"
 gnuplot_cmd_base += "set xlabel 'Concurrent users';"
 gnuplot_cmd_base += "set ylabel 'Response time (ms)';"
@@ -354,3 +354,6 @@ File.open("#{outdir}/index.html", 'w') { |fout|
     fout.write(line_out) 
   end
 }
+
+# update the index in the results directory
+system("#{pwd}/update_index.rb #{pwd}/#{OUT_SUBDIR}")
