@@ -4,7 +4,25 @@
 require 'fileutils'
 INDEX="index.html"
 
-def build_html(title, hash)
+def build_comparison_html(title, hash)
+  html  = "<h2>#{title}</h2>\n"
+  html += "<ul>\n"
+  
+  hash.each do |key, val|
+    if val.size > 1
+      html += "<li>#{key[0]}, #{key[1]}<ul>"
+      val.sort.each do |dir|
+        html += "<li><a href=\"#{dir[1]}\">#{dir[0]}</a></li>"
+      end
+      html += "</ul></li>\n"
+    end
+  end
+  
+  html += "</ul>\n"
+  return html
+end
+
+def build_list_html(title, hash)
   html  = "<h2>#{title}</h2>\n"
   html += "<ul>\n"
   
@@ -54,15 +72,20 @@ html_footer = <<-EOD
 </body>
 EOD
 
+plans = []
 configurations = Hash.new
 workspaces = Hash.new
 tests = Hash.new
+
+wc_pairs = Hash.new
+wt_pairs = Hash.new
 
 Dir.glob("*").each do |dir|
   if File.directory?(dir)
     parts = dir.split("-")
     if parts.size == 5
       puts "Adding #{dir} ..."
+      plans.push(dir)
       configuration = parts[2]
       workspace = parts[3]
       test = parts[4]
@@ -81,18 +104,37 @@ Dir.glob("*").each do |dir|
         tests[test] = [ ]
       end
       tests[test].push(dir)
+
+      # not interested in comparing when configuration and test are the same
+      key = [ workspace, configuration ]
+      unless wc_pairs.has_key?(key)
+        wc_pairs[ key ] = []
+      end
+      wc_pairs[key].push([test, dir])
+
+      key = [ workspace, test ]
+      unless wt_pairs.has_key?(key)
+        wt_pairs[key] = []
+      end
+      wt_pairs[key].push([configuration, dir])
     else
       puts "Skipping #{dir} ..."
     end
   end
 end
 
-configurations_html = build_html("Server configurations", configurations)
-workspaces_html     = build_html("Workspaces", workspaces)
-tests_html          = build_html("Tests", tests)
+wt_pairs_html = build_comparison_html("Configuration Comparison", wt_pairs)
+wc_pairs_html = build_comparison_html("Test Comparison", wc_pairs)
+
+configurations_html = build_list_html("Server configurations", configurations)
+workspaces_html     = build_list_html("Workspaces", workspaces)
+tests_html          = build_list_html("Tests", tests)
 
 File.open(INDEX, 'w') do |file|
   file.write(html_header)
+  file.write(wt_pairs_html)
+  file.write(wc_pairs_html)
+  file.write("<hr/>")
   file.write(workspaces_html)
   file.write(tests_html)
   file.write(configurations_html)
