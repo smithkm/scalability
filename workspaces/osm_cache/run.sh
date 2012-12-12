@@ -13,19 +13,19 @@ if [ "${TEST}" = "wms_100" ]; then
   jmeter -p ../jmeter.properties -t wms.jmx -n -Jnodes=${NODES} -Jthreads=${THREADS} -Jloops=${LOOPS} -Jbboxes=tiles 
   rm -r summary*.csv
   jmeter -p ../jmeter.properties -t wms.jmx -n -Jnodes=${NODES} -Jthreads=${THREADS} -Jloops=${LOOPS} -Jbboxes=tiles
-if [ "${TEST}" = "wms_50" ]; then
+elif [ "${TEST}" = "wms_50" ]; then
   # pre-seed half of the tiles
   jmeter -p ../jmeter.properties -t wms.jmx -n -Jnodes=${NODES} -Jthreads=${THREADS} -Jloops=${LOOPS} -Jbboxes=tiles_50 
   rm -r summary*.csv
   jmeter -p ../jmeter.properties -t wms.jmx -n -Jnodes=${NODES} -Jthreads=${THREADS} -Jloops=${LOOPS} -Jbboxes=tiles 
-if [ "${TEST}" = "wms_25" ]; then
+elif [ "${TEST}" = "wms_25" ]; then
   # pre-seed a quarter of the tiles
   jmeter -p ../jmeter.properties -t wms.jmx -n -Jnodes=${NODES} -Jthreads=${THREADS} -Jloops=${LOOPS} -Jbboxes=tiles_25 
   rm -r summary*.csv
-  jmeter -p ../jmeter.properties -t wms.jmx -n -Jnodes=${NODES} -Jthreads=${THREADS} -Jloops=${LOOPS} 
-if [ "${TEST}" = "wms_0" ]; then
+  jmeter -p ../jmeter.properties -t wms.jmx -n -Jnodes=${NODES} -Jthreads=${THREADS} -Jloops=${LOOPS} -Jbboxes=tiles
+elif [ "${TEST}" = "wms_0" ]; then
   # do not pre-seed any tiles
-  jmeter -p ../jmeter.properties -t wms.jmx -n -Jnodes=${NODES} -Jthreads=${THREADS} -Jloops=${LOOPS}
+  jmeter -p ../jmeter.properties -t wms.jmx -n -Jnodes=${NODES} -Jthreads=${THREADS} -Jloops=${LOOPS} -Jbboxes=tiles
 else
   echo "Unknown test"
   exit 1
