@@ -5,7 +5,7 @@ NODES=$2
 THREADS=$3
 LOOPS=$4
 
-ssh -p 7777 tomcat@scale.dev.opengeo.org "rm -r /var/lib/geoserver_data/osm/gwc"
+ssh -p 7777 tomcat@scale.dev.opengeo.org "rm -r /var/lib/geoserver_data/osm_cache/gwc"
 
 # cache tests have four steps 1) pre-seeding 2) removing generated jmeter results 3) testing 4) clearing cache
 if [ "${TEST}" = "wms_100" ]; then
@@ -31,4 +31,4 @@ else
   exit 1
 fi
 
-ssh -p 7777 tomcat@scale.dev.opengeo.org "rm -r /var/lib/geoserver_data/osm/gwc"
+ssh -p 7777 tomcat@scale.dev.opengeo.org "rm -r /var/lib/geoserver_data/osm_cache/gwc"
