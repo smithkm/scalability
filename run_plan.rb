@@ -113,7 +113,7 @@ end
 # set test case
 test = ARGV[2]
 
-# set number nodes to test; 1 by default otherwise as arg
+# set number nodes to test; 1-10 by default otherwise as arg
 if ARGV[3]
   node_cfg = [ ]
   args=ARGV[3].split(',')
@@ -132,7 +132,7 @@ if ARGV[3]
   node_cfg.delete_if { |n| n < 0 }
   node_cfg = node_cfg.uniq.sort
 else
-  node_cfg = [ 1 ]
+  node_cfg = [ 1 2 3 4 5 6 7 8 9 10 ]
 end
 
 # set the number of threads to simulate; 1-128 by default
