@@ -132,7 +132,10 @@ if ARGV[3]
   node_cfg.delete_if { |n| n < 0 }
   node_cfg = node_cfg.uniq.sort
 else
-  node_cfg = [ 1 2 3 4 5 6 7 8 9 10 ]
+  node_cfg = [ ]
+  for n in 1..10
+    node_cfg.push(n)
+  end
 end
 
 # set the number of threads to simulate; 1-128 by default
