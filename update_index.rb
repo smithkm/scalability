@@ -11,9 +11,12 @@ def build_comparison_html(title, hash)
   hash.each do |key, val|
     if val.size > 1
       html += "<li>#{key[0]}, #{key[1]}<ul>"
+
+      list = ""
       val.sort.each do |dir|
-        html += "<li><a href=\"#{dir[1]}\">#{dir[0]}</a></li>"
+        list += "<li><a href=\"#{dir[1]}\">#{dir[0]}</a></li>"
       end
+      html += list
       html += "</ul></li>\n"
     end
   end
@@ -29,7 +32,7 @@ def build_list_html(title, hash)
   hash.each do |key, val|
     html += "<li>#{key}<ul>"
     val.each do |dir|
-      html += "<li><a href=\"#{dir}\">#{dir}</a></li>"
+      html += "<li><input type=\"checkbox\" name=\"dir\[\]\" value=\"#{dir}\"><a href=\"#{dir}\">#{dir}</a></li>"
     end
     html += "</ul></li>\n"
   end
@@ -66,9 +69,25 @@ html_header = <<-EOD
 </head>
 <body>
   <h1>Test Run Index</h1>
+  <form name="input" action="compare.rb" method="get">
 EOD
 
 html_footer = <<-EOD
+  <br/>
+  <select name="nodes">
+    <option value="1">1</option>
+    <option value="2">2</option>
+    <option value="3">3</option>
+    <option value="4">4</option>
+    <option value="5">5</option>
+    <option value="6">6</option>
+    <option value="7">7</option>
+    <option value="8">8</option>
+    <option value="9">9</option>
+    <option value="10">10</option>
+  </select>
+  <input type="submit" value="Compare...">
+  </form>
 </body>
 EOD
 

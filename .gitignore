@@ -1,3 +1,4 @@
 jmeter.log
 *~
-results/
+results/[0-9]*
+results/index.html*
