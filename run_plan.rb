@@ -211,7 +211,7 @@ Net::SSH.start(APP_SERVER, conf["CONTAINER"], :port => 7777 ) do |ssh|
   # set logging
   puts "Set logging level ..."
   log_conf="#{DATA_DIR}/#{workspace}/logging.xml"
-  level = conf["LOGGING.level"]
+  level = conf["LOGGING.level"] + ".properties"
   ssh.exec!("sed -i \"s/<level>.*<\\\/level>/<level>#{level}<\\\/level>/\" #{log_conf}")
 end
 
@@ -249,6 +249,11 @@ gnuplot_cmd_base += "set xlabel 'Concurrent users';"
 gnuplot_cmd_base += "set ylabel 'Response time (ms)';"
 gnuplot_cmd_base += "set datafile separator ',';"
 gnuplot_cmd_all = "plot "
+
+# remove any old results
+Dir.glob("#{workspace_dir}/summary_*.csv").each { |file|
+  FileUtils.rm(file)
+}
 
 # run the test for each number of nodes
 results_table = ""
