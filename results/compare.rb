@@ -17,11 +17,11 @@ def output_error(title, message)
   }
 end
 
-dirs = @cgi.params['dir[]'].uniq
+dirs = @cgi.params['dir[]'].uniq.sort
 
 # check for arguments
 if dirs.empty? || dirs.size < 2
-  output_error("incorrect arguments", "at least 2 tests must be selected")
+  output_error("incorrect arguments", "at least 2 tests must be selected<br\>dirs=#{dirs.to_s}")
   exit 1
 end
 
