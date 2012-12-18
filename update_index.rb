@@ -4,18 +4,33 @@
 require 'fileutils'
 INDEX="index.html"
 
+def to_colour(str, colour)
+  return "<id style=\"color:#{colour}\">#{str}</id>"
+end
+def red(str)
+  return to_colour(str, "red")
+end
+def blue(str)
+  return to_colour(str, "blue")
+end
+def green(str)
+  return to_colour(str, "green")
+end
+def pretty_parts(parts)
+  return red(parts[2]) + " " + blue(parts[3]) + " " + green(parts[4])
+end
+
 def build_comparison_html(title, hash)
   html  = "<h2>#{title}</h2>\n"
   html += "<ul>\n"
   
   hash.each do |key, val|
     if val.size > 1
-      html += "<li>#{key[0]}, #{key[1]}<ul>"
-
       list = ""
       val.sort.each do |dir|
-        list += "<li><a href=\"#{dir[1]}\">#{dir[0]}</a></li>"
+        list += "<li><input type=\"checkbox\" name=\"dir\[\]\" value=\"#{dir[1]}\" /><a href=\"#{dir[1]}\">#{dir[0]}</a></li>"
       end
+      html += "<li>common: #{key[0]}, #{key[1]}<ul>"
       html += list
       html += "</ul></li>\n"
     end
@@ -32,7 +47,8 @@ def build_list_html(title, hash)
   hash.each do |key, val|
     html += "<li>#{key}<ul>"
     val.each do |dir|
-      html += "<li><input type=\"checkbox\" name=\"dir\[\]\" value=\"#{dir}\"><a href=\"#{dir}\">#{dir}</a></li>"
+      parts = dir.split("-")
+      html += "<li><input type=\"checkbox\" name=\"dir\[\]\" value=\"#{dir}\" /><a href=\"#{dir}\">#{parts[0]}-#{parts[1]}</a> #{pretty_parts(parts)}</li>"
     end
     html += "</ul></li>\n"
   end
@@ -65,8 +81,7 @@ html_header = <<-EOD
   <head>
     <title>Test Run Index</title>
     <meta http-equiv="content-type" content="text/html; charset=iso-8859-1">
-  </style>
-</head>
+  </head>
 <body>
   <h1>Test Run Index</h1>
   <form name="input" action="compare.rb" method="get">
@@ -142,8 +157,8 @@ Dir.glob("*").each do |dir|
   end
 end
 
-wt_pairs_html = build_comparison_html("Configuration Comparison", wt_pairs)
-wc_pairs_html = build_comparison_html("Test Comparison", wc_pairs)
+wt_pairs_html = build_comparison_html("Compare configurations", wt_pairs)
+wc_pairs_html = build_comparison_html("Compare tests", wc_pairs)
 
 configurations_html = build_list_html("Server configurations", configurations)
 workspaces_html     = build_list_html("Workspaces", workspaces)
@@ -151,11 +166,11 @@ tests_html          = build_list_html("Tests", tests)
 
 File.open(INDEX, 'w') do |file|
   file.write(html_header)
-  file.write(wt_pairs_html)
-  file.write(wc_pairs_html)
-  file.write("<hr/>")
   file.write(workspaces_html)
   file.write(tests_html)
   file.write(configurations_html)
+  file.write("<hr/>")
+  file.write(wt_pairs_html)
+  file.write(wc_pairs_html)
   file.write(html_footer)
 end
