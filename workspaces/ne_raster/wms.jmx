@@ -37,7 +37,7 @@
             </elementProp>
             <elementProp name="layers" elementType="HTTPArgument">
               <boolProp name="HTTPArgument.always_encode">true</boolProp>
-              <stringProp name="Argument.value">NE2_HR_LC_SR_W_DR</stringProp>
+              <stringProp name="Argument.value">${__P(layer, NE2_HR_LC_SR_W_DR)}</stringProp>
               <stringProp name="Argument.metadata">=</stringProp>
               <boolProp name="HTTPArgument.use_equals">true</boolProp>
               <stringProp name="Argument.name">layers</stringProp>
