@@ -94,12 +94,19 @@ pwd = Dir.pwd
 # set default configurations and read custom config file
 conf = Hash.new 
 read_config(BASE_CONF_FILE, conf)
-conf_file = "config/#{ARGV[0]}"
-if File.exists?(conf_file)
-  read_config(conf_file, conf)
-else
-  puts "unable to find config file"
-  exit 1
+configs = ARGV[0]
+configs.split(",").each do | config |
+  file = "config/#{config}"
+  if File.exists?(file)
+    read_config(file, conf)
+  else
+    puts "unable to find config #{file}"
+    exit 1
+  end
+end
+configs = configs.gsub(/,/, '.')
+conf.each do |k,v|
+  puts k + "=" + v
 end
 
 # check test case directory
@@ -153,7 +160,7 @@ else
   max_threads=128
 end
 
-outname = Time.now.strftime("%Y%m%d-%H%M%S-#{ARGV[0]}-#{ARGV[1]}-#{ARGV[2]}")
+outname = Time.now.strftime("%Y%m%d-%H%M%S-#{configs}-#{ARGV[1]}-#{ARGV[2]}")
 outdir = "#{pwd}/#{OUT_SUBDIR}/#{outname}"
 FileUtils.mkdir_p(outdir)
 
@@ -211,7 +218,7 @@ Net::SSH.start(APP_SERVER, conf["CONTAINER"], :port => 7777 ) do |ssh|
   # set logging
   puts "Set logging level ..."
   log_conf="#{DATA_DIR}/#{workspace}/logging.xml"
-  level = conf["LOGGING.level"]
+  level = conf["LOGGING.level"] + ".properties"
   ssh.exec!("sed -i \"s/<level>.*<\\\/level>/<level>#{level}<\\\/level>/\" #{log_conf}")
 end
 
@@ -249,6 +256,11 @@ gnuplot_cmd_base += "set xlabel 'Concurrent users';"
 gnuplot_cmd_base += "set ylabel 'Response time (ms)';"
 gnuplot_cmd_base += "set datafile separator ',';"
 gnuplot_cmd_all = "plot "
+
+# remove any old results
+Dir.glob("#{workspace_dir}/summary_*.csv").each { |file|
+  FileUtils.rm(file)
+}
 
 # run the test for each number of nodes
 results_table = ""
@@ -353,7 +365,7 @@ node_cfg.each { |nodes|
 
 File.open("#{outdir}/index.html", 'w') { |fout| 
   File.open("#{pwd}/index.html.template", "r").each_line do |line_in|
-    line_out = line_in.gsub("${name}", outname).gsub("${config}", conf_html).gsub("${results}", results_html).gsub("${workspace}", workspace).gsub("${test}", test).gsub("${setup}", conf_file)
+    line_out = line_in.gsub("${name}", outname).gsub("${config}", conf_html).gsub("${results}", results_html).gsub("${workspace}", workspace).gsub("${test}", test).gsub("${setup}", configs)
     fout.write(line_out) 
   end
 }
