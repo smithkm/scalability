@@ -1,1 +1,1 @@
-JAVA_GC=UseConcMarkSweepGC
+JAVA_GC=-XX:+UseConcMarkSweepGC
