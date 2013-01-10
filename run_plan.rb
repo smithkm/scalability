@@ -27,12 +27,19 @@ DATA_DIR="/var/lib/geoserver_data"
 
 # check if server is responsive
 def check_server(retries=20)
+  print 'checking server ... '
   until retries < 0
-    return true if Net::HTTP.get_response(URI.parse("#{GEOSERVER_URL}/web/")).kind_of?(Net::HTTPSuccess)
+    if Net::HTTP.get_response(URI.parse("#{GEOSERVER_URL}/web/")).kind_of?(Net::HTTPSuccess)
+      puts 'response'
+      return true
+    end
+    print "#{retries} "
+    STDOUT.flush
     sleep 1
     retries -= 1
   end
 
+  puts 'no response'
   return false
 end
 
@@ -184,8 +191,12 @@ if conf["CONTAINER"] == "tomcat"
   Net::SSH.start(APP_SERVER, "tomcat", :port => 7777 ) do |ssh|
     unless @debug
       puts "Shutting down running nodes ..."
-      ssh.exec!("pkill java")
-      sleep 10
+      ssh.exec("pkill java")
+      ssh.exec!("pkill -9 java") if check_server(20)
+      if check_server(5)
+	puts "Server still running ... aborting"
+        exit 1
+      end
     end
 
     puts "Setting JAVA options ..."
