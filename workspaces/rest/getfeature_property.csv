@@ -1,0 +1,10 @@
+ne_10m_admin_0_boundary_lines_land,type,Land
+ne_10m_admin_1_states_provinces_lines_shp,name_r,Punjab
+ne_10m_roads,type,Beltway
+ne_10m_populated_places,NAME,San Juan
+ne_10m_populated_places,NAME,Ottawa
+ne_10m_populated_places,FEATURECLA,Admin-0 capital
+ne_10m_populated_places,FEATURECLA,Admin-1 capital
+ne_10m_populated_places,SCALERANK,7
+ne_10m_populated_places,WORLDCITY,1
+ne_10m_populated_places,TIMEZONE,America/Vancouver
