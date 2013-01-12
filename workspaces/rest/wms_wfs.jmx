@@ -55,7 +55,7 @@
       <hashTree>
         <BeanShellSampler guiclass="BeanShellSamplerGui" testclass="BeanShellSampler" testname="Upload data" enabled="false">
           <stringProp name="BeanShellSampler.query">IsSuccess = true;
-Process p = Runtime.getRuntime().exec(&quot;wfs_pg.py&quot;);
+Process p = Runtime.getRuntime().exec(&quot;populate.py&quot;);
 p.waitFor();
 
 ResponseCode = p.exitValue();

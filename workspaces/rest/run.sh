@@ -6,7 +6,7 @@ NODES=$2
 THREADS=$3
 LOOPS=$4
 
-if [ "${TEST}" = "wfs-t" ]; then
+if [ "${TEST}" = "rest" ]; then
   exit 1
 else
   echo "Unknown test"
