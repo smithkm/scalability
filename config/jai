@@ -1,0 +1,3 @@
+JAI.tileThreads=16
+JAI.pngAcceleration=true
+JAI.jpegAcceleration=true
