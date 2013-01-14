@@ -137,7 +137,7 @@ CREATE INDEX wfs_roads_the_geom_idx ON wfs_roads USING gist (the_geom);
         </JDBCSampler>
         <hashTree/>
       </hashTree>
-      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Thread Group" enabled="true">
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Thread Group" enabled="false">
         <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
         <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
           <boolProp name="LoopController.continue_forever">false</boolProp>
@@ -172,7 +172,7 @@ CREATE INDEX wfs_roads_the_geom_idx ON wfs_roads USING gist (the_geom);
         &lt;gml:MultiLineString srsName=&quot;http://www.opengis.net/gml/srs/epsg.xml#4326&quot;&gt;&#xd;
           &lt;gml:lineStringMember&gt;&#xd;
             &lt;gml:LineString&gt;&#xd;
-              &lt;gml:coordinates decimal=&quot;.&quot; cs=&quot;,&quot; ts=&quot; &quot;&gt;${the_geom}&lt;/gml:coordinates&gt;&#xd;
+              &lt;gml:coordinates&gt;${the_geom}&lt;/gml:coordinates&gt;&#xd;
             &lt;/gml:LineString&gt;&#xd;
           &lt;/gml:lineStringMember&gt;&#xd;
         &lt;/gml:MultiLineString&gt;&#xd;
@@ -231,7 +231,7 @@ CREATE INDEX wfs_roads_the_geom_idx ON wfs_roads USING gist (the_geom);
           </HTTPSamplerProxy>
           <hashTree/>
           <CSVDataSet guiclass="TestBeanGUI" testclass="CSVDataSet" testname="CSV Data Set Config" enabled="true">
-            <stringProp name="delimiter">%</stringProp>
+            <stringProp name="delimiter">#</stringProp>
             <stringProp name="fileEncoding"></stringProp>
             <stringProp name="filename">roads.csv</stringProp>
             <boolProp name="quotedData">false</boolProp>
