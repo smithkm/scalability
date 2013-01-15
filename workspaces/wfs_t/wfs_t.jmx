@@ -43,7 +43,7 @@
         <stringProp name="checkQuery">Select 1</stringProp>
         <stringProp name="connectionAge">5000</stringProp>
         <stringProp name="dataSource">Postgres</stringProp>
-        <stringProp name="dbUrl">jdbc:postgresql://${__P(dbserver,localhost)}:5432/ne_tmp</stringProp>
+        <stringProp name="dbUrl">jdbc:postgresql://${__P(dbserver,localhost)}:5432/wfs_t</stringProp>
         <stringProp name="driver">org.postgresql.Driver</stringProp>
         <boolProp name="keepAlive">false</boolProp>
         <stringProp name="password">openge78902</stringProp>
@@ -61,7 +61,7 @@
           <stringProp name="LoopController.loops">1</stringProp>
         </elementProp>
         <stringProp name="ThreadGroup.num_threads">1</stringProp>
-        <stringProp name="ThreadGroup.ramp_time">1</stringProp>
+        <stringProp name="ThreadGroup.ramp_time">0</stringProp>
         <longProp name="ThreadGroup.start_time">1357862668000</longProp>
         <longProp name="ThreadGroup.end_time">1357862668000</longProp>
         <boolProp name="ThreadGroup.scheduler">false</boolProp>
@@ -137,14 +137,14 @@ CREATE INDEX wfs_roads_the_geom_idx ON wfs_roads USING gist (the_geom);
         </JDBCSampler>
         <hashTree/>
       </hashTree>
-      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Thread Group" enabled="false">
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Thread Group" enabled="true">
         <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
         <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
           <boolProp name="LoopController.continue_forever">false</boolProp>
-          <intProp name="LoopController.loops">-1</intProp>
+          <stringProp name="LoopController.loops">${__P(loops,1)}</stringProp>
         </elementProp>
-        <stringProp name="ThreadGroup.num_threads">1</stringProp>
-        <stringProp name="ThreadGroup.ramp_time">1</stringProp>
+        <stringProp name="ThreadGroup.num_threads">${__P(threads,1)}</stringProp>
+        <stringProp name="ThreadGroup.ramp_time">0</stringProp>
         <longProp name="ThreadGroup.start_time">1357865766000</longProp>
         <longProp name="ThreadGroup.end_time">1357865766000</longProp>
         <boolProp name="ThreadGroup.scheduler">false</boolProp>
@@ -165,7 +165,7 @@ CREATE INDEX wfs_roads_the_geom_idx ON wfs_roads USING gist (the_geom);
   xmlns:naturalearth=&quot;http://www.naturalearth.org&quot;&#xd;
   xmlns:gml=&quot;http://www.opengis.net/gml&quot;&#xd;
   xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;&#xd;
-  xsi:schemaLocation=&quot;http://www.opengis.net/wfs http://schemas.opengis.net/wfs/1.0.0/WFS-transaction.xsd http://www.naturalearth.org/ http://localhost:8080/geoserver/wfs/DescribeFeatureType?typename=naturalearth:wfs_roads&quot; &gt;&#xd;
+  xsi:schemaLocation=&quot;http://www.opengis.net/wfs http://schemas.opengis.net/wfs/1.0.0/WFS-transaction.xsd http://www.naturalearth.org/ http://${__P(server,localhost)}:${__P(port,8080)}/geoserver/wfs/DescribeFeatureType?typename=naturalearth:wfs_roads&quot; &gt;&#xd;
   &lt;wfs:Insert&gt;&#xd;
     &lt;naturalearth:wfs_roads&gt;&#xd;
         &lt;naturalearth:the_geom&gt;&#xd;
@@ -243,7 +243,7 @@ CREATE INDEX wfs_roads_the_geom_idx ON wfs_roads USING gist (the_geom);
           <hashTree/>
         </hashTree>
       </hashTree>
-      <ResultCollector guiclass="ViewResultsFullVisualizer" testclass="ResultCollector" testname="View Results Tree" enabled="true">
+      <ResultCollector guiclass="ViewResultsFullVisualizer" testclass="ResultCollector" testname="View Results Tree" enabled="false">
         <boolProp name="ResultCollector.error_logging">false</boolProp>
         <objProp>
           <name>saveConfig</name>
