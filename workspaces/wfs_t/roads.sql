@@ -18,8 +18,9 @@ SET default_with_oids = false;
 -- Name: wfs_roads; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
 --
 
+CREATE SEQUENCE wfs_roads_seq;
 CREATE TABLE wfs_roads (
-    fid integer DEFAULT nextval('ne_10m_roads_fid_seq'::regclass) NOT NULL,
+    fid integer NOT NULL DEFAULT NEXTVAL('wfs_roads_seq'),
     the_geom geometry(MultiLineString,4326),
     scalerank bigint,
     featurecla character varying(30),
