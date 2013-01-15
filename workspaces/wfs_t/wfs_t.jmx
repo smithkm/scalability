@@ -304,7 +304,7 @@ CREATE INDEX wfs_roads_the_geom_idx ON wfs_roads USING gist (the_geom);
             <bytes>true</bytes>
           </value>
         </objProp>
-        <stringProp name="filename">summary_${__time(yyyyMMdd-HHmmss)}.csv</stringProp>
+        <stringProp name="filename">${__property(user.dir)}${__BeanShell(File.separator,)}summary_${__P(nodes,01)}_${__P(threads)}.csv</stringProp>
       </ResultCollector>
       <hashTree/>
     </hashTree>
