@@ -38,106 +38,7 @@
         <stringProp name="HTTPSampler.concurrentPool">4</stringProp>
       </ConfigTestElement>
       <hashTree/>
-      <JDBCDataSource guiclass="TestBeanGUI" testclass="JDBCDataSource" testname="JDBC Connection Configuration" enabled="true">
-        <boolProp name="autocommit">true</boolProp>
-        <stringProp name="checkQuery">Select 1</stringProp>
-        <stringProp name="connectionAge">5000</stringProp>
-        <stringProp name="dataSource">Postgres</stringProp>
-        <stringProp name="dbUrl">jdbc:postgresql://${__P(dbserver,localhost)}:5432/wfs_t</stringProp>
-        <stringProp name="driver">org.postgresql.Driver</stringProp>
-        <boolProp name="keepAlive">false</boolProp>
-        <stringProp name="password">openge78902</stringProp>
-        <stringProp name="poolMax">10</stringProp>
-        <stringProp name="timeout">10000</stringProp>
-        <stringProp name="transactionIsolation">DEFAULT</stringProp>
-        <stringProp name="trimInterval">60000</stringProp>
-        <stringProp name="username">opengeo</stringProp>
-      </JDBCDataSource>
-      <hashTree/>
-      <SetupThreadGroup guiclass="SetupThreadGroupGui" testclass="SetupThreadGroup" testname="setUp Thread Group" enabled="true">
-        <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
-        <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
-          <boolProp name="LoopController.continue_forever">false</boolProp>
-          <stringProp name="LoopController.loops">1</stringProp>
-        </elementProp>
-        <stringProp name="ThreadGroup.num_threads">1</stringProp>
-        <stringProp name="ThreadGroup.ramp_time">0</stringProp>
-        <longProp name="ThreadGroup.start_time">1357862668000</longProp>
-        <longProp name="ThreadGroup.end_time">1357862668000</longProp>
-        <boolProp name="ThreadGroup.scheduler">false</boolProp>
-        <stringProp name="ThreadGroup.duration"></stringProp>
-        <stringProp name="ThreadGroup.delay"></stringProp>
-      </SetupThreadGroup>
-      <hashTree>
-        <JDBCSampler guiclass="TestBeanGUI" testclass="JDBCSampler" testname="Create DB Table" enabled="true">
-          <stringProp name="TestPlan.comments">removes the existing test db and recreates with exactly the desired </stringProp>
-          <stringProp name="dataSource">Postgres</stringProp>
-          <stringProp name="query">SET statement_timeout = 0;
-SET client_encoding = &apos;UTF8&apos;;
-SET standard_conforming_strings = on;
-SET check_function_bodies = false;
-SET client_min_messages = warning;
-SET search_path = public, pg_catalog;
-SET default_tablespace = &apos;&apos;;
-SET default_with_oids = false;
-
-DROP TABLE IF EXISTS wfs_roads ;
-
---
--- Name: wfs_roads; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
---
-
-CREATE TABLE wfs_roads (
-    fid integer DEFAULT nextval(&apos;ne_10m_roads_fid_seq&apos;::regclass) NOT NULL,
-    the_geom geometry(MultiLineString,4326),
-    scalerank bigint,
-    featurecla character varying(30),
-    type character varying(50),
-    sov_a3 character varying(3),
-    note character varying(50),
-    edited character varying(50),
-    name character varying(25),
-    namealt character varying(25),
-    namealtt character varying(30),
-    routeraw character varying(50),
-    question bigint,
-    length_km integer,
-    toll integer,
-    ne_part character varying(50),
-    label character varying(50),
-    label2 character varying(50),
-    local character varying(30),
-    localtype character varying(30),
-    localalt character varying(30),
-    labelrank integer,
-    ignore integer,
-    add integer,
-    rwdb_rd_id integer,
-    orig_fid integer,
-    prefix character varying(5),
-    uident integer,
-    continent character varying(50),
-    expressway integer,
-    level character varying(50),
-    CONSTRAINT enforce_dims_the_geom CHECK ((st_ndims(the_geom) = 2)),
-    CONSTRAINT enforce_geotype_the_geom CHECK (((geometrytype(the_geom) = &apos;MULTILINESTRING&apos;::text) OR (the_geom IS NULL))),
-    CONSTRAINT enforce_srid_the_geom CHECK ((st_srid(the_geom) = 4326))
-);
-
-
-ALTER TABLE ONLY wfs_roads
-    ADD CONSTRAINT wfs_roads_pkey PRIMARY KEY (fid);
-CREATE INDEX wfs_roads_the_geom_idx ON wfs_roads USING gist (the_geom);
-</stringProp>
-          <stringProp name="queryArguments"></stringProp>
-          <stringProp name="queryArgumentsTypes"></stringProp>
-          <stringProp name="queryType">Callable Statement</stringProp>
-          <stringProp name="resultVariable"></stringProp>
-          <stringProp name="variableNames"></stringProp>
-        </JDBCSampler>
-        <hashTree/>
-      </hashTree>
-      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Thread Group" enabled="true">
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="${__P(threads)}" enabled="true">
         <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
         <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
           <boolProp name="LoopController.continue_forever">false</boolProp>
@@ -275,7 +176,7 @@ CREATE INDEX wfs_roads_the_geom_idx ON wfs_roads USING gist (the_geom);
         <stringProp name="filename"></stringProp>
       </ResultCollector>
       <hashTree/>
-      <ResultCollector guiclass="StatVisualizer" testclass="ResultCollector" testname="Aggregate Report" enabled="true">
+      <ResultCollector guiclass="SummaryReport" testclass="ResultCollector" testname="Summary Report" enabled="true">
         <boolProp name="ResultCollector.error_logging">false</boolProp>
         <objProp>
           <name>saveConfig</name>
@@ -283,14 +184,14 @@ CREATE INDEX wfs_roads_the_geom_idx ON wfs_roads USING gist (the_geom);
             <time>true</time>
             <latency>true</latency>
             <timestamp>true</timestamp>
-            <success>true</success>
-            <label>true</label>
-            <code>true</code>
+            <success>false</success>
+            <label>false</label>
+            <code>false</code>
             <message>false</message>
             <threadName>true</threadName>
-            <dataType>true</dataType>
+            <dataType>false</dataType>
             <encoding>false</encoding>
-            <assertions>true</assertions>
+            <assertions>false</assertions>
             <subresults>false</subresults>
             <responseData>false</responseData>
             <samplerData>false</samplerData>
@@ -302,6 +203,7 @@ CREATE INDEX wfs_roads_the_geom_idx ON wfs_roads USING gist (the_geom);
             <saveAssertionResultsFailureMessage>false</saveAssertionResultsFailureMessage>
             <assertionsResultsToSave>0</assertionsResultsToSave>
             <bytes>true</bytes>
+            <sampleCount>true</sampleCount>
           </value>
         </objProp>
         <stringProp name="filename">${__property(user.dir)}${__BeanShell(File.separator,)}summary_${__P(nodes,01)}_${__P(threads)}.csv</stringProp>

@@ -1,0 +1,987 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jmeterTestPlan version="1.2" properties="2.3" jmeter="2.8 r1393162">
+  <hashTree>
+    <TestPlan guiclass="TestPlanGui" testclass="TestPlan" testname="WFS Test" enabled="true">
+      <stringProp name="TestPlan.comments"></stringProp>
+      <boolProp name="TestPlan.functional_mode">false</boolProp>
+      <boolProp name="TestPlan.serialize_threadgroups">false</boolProp>
+      <elementProp name="TestPlan.user_defined_variables" elementType="Arguments" guiclass="ArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
+        <collectionProp name="Arguments.arguments"/>
+      </elementProp>
+      <stringProp name="TestPlan.user_define_classpath"></stringProp>
+    </TestPlan>
+    <hashTree>
+      <SetupThreadGroup guiclass="SetupThreadGroupGui" testclass="SetupThreadGroup" testname="setUp Thread Group" enabled="true">
+        <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
+        <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
+          <boolProp name="LoopController.continue_forever">false</boolProp>
+          <stringProp name="LoopController.loops">1</stringProp>
+        </elementProp>
+        <stringProp name="ThreadGroup.num_threads">1</stringProp>
+        <stringProp name="ThreadGroup.ramp_time">0</stringProp>
+        <longProp name="ThreadGroup.start_time">1357862668000</longProp>
+        <longProp name="ThreadGroup.end_time">1357862668000</longProp>
+        <boolProp name="ThreadGroup.scheduler">false</boolProp>
+        <stringProp name="ThreadGroup.duration"></stringProp>
+        <stringProp name="ThreadGroup.delay"></stringProp>
+      </SetupThreadGroup>
+      <hashTree>
+        <JDBCSampler guiclass="TestBeanGUI" testclass="JDBCSampler" testname="Set up jdbc catalog" enabled="true">
+          <stringProp name="TestPlan.comments">removes the existing test db and recreates with exactly the desired </stringProp>
+          <stringProp name="dataSource">Postgres</stringProp>
+          <stringProp name="query">--
+-- PostgreSQL database dump
+--
+
+SET statement_timeout = 0;
+SET client_encoding = &apos;UTF8&apos;;
+SET standard_conforming_strings = on;
+SET check_function_bodies = false;
+SET client_min_messages = warning;
+
+--
+-- Name: plpgsql; Type: EXTENSION; Schema: -; Owner: 
+--
+
+CREATE EXTENSION IF NOT EXISTS plpgsql WITH SCHEMA pg_catalog;
+
+
+--
+-- Name: EXTENSION plpgsql; Type: COMMENT; Schema: -; Owner: 
+--
+
+COMMENT ON EXTENSION plpgsql IS &apos;PL/pgSQL procedural language&apos;;
+
+
+SET search_path = public, pg_catalog;
+
+SET default_tablespace = &apos;&apos;;
+
+SET default_with_oids = false;
+
+DROP TABLE default_object;
+DROP TABLE object
+DROP SEQUENCE object_oid_seq
+DROP TABLE object_property
+DROP TABLE property_type
+DROP SEQUENCE property_type_oid_seq
+DROP TABLE type
+DROP SEQUENCE type_oid_seq 
+
+--
+-- Name: default_object; Type: TABLE; Schema: public; Owner: opengeo; Tablespace: 
+--
+
+CREATE TABLE default_object (
+    def_key character varying(255) NOT NULL,
+    id character varying(255) NOT NULL
+);
+
+
+ALTER TABLE public.default_object OWNER TO opengeo;
+
+--
+-- Name: object; Type: TABLE; Schema: public; Owner: opengeo; Tablespace: 
+--
+
+CREATE TABLE object (
+    oid integer NOT NULL,
+    type_id integer NOT NULL,
+    id character varying(255) NOT NULL,
+    blob text NOT NULL
+);
+
+
+ALTER TABLE public.object OWNER TO opengeo;
+
+--
+-- Name: object_oid_seq; Type: SEQUENCE; Schema: public; Owner: opengeo
+--
+
+CREATE SEQUENCE object_oid_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.object_oid_seq OWNER TO opengeo;
+
+--
+-- Name: object_oid_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: opengeo
+--
+
+ALTER SEQUENCE object_oid_seq OWNED BY object.oid;
+
+
+--
+-- Name: object_property; Type: TABLE; Schema: public; Owner: opengeo; Tablespace: 
+--
+
+CREATE TABLE object_property (
+    oid integer NOT NULL,
+    property_type integer NOT NULL,
+    id character varying(255) NOT NULL,
+    related_oid integer,
+    related_property_type integer,
+    colindex integer NOT NULL,
+    value character varying(255)
+);
+
+
+ALTER TABLE public.object_property OWNER TO opengeo;
+
+--
+-- Name: property_type; Type: TABLE; Schema: public; Owner: opengeo; Tablespace: 
+--
+
+CREATE TABLE property_type (
+    oid integer NOT NULL,
+    target_property integer,
+    type_id integer NOT NULL,
+    name character varying(255) NOT NULL,
+    collection boolean NOT NULL,
+    text boolean NOT NULL
+);
+
+
+ALTER TABLE public.property_type OWNER TO opengeo;
+
+--
+-- Name: property_type_oid_seq; Type: SEQUENCE; Schema: public; Owner: opengeo
+--
+
+CREATE SEQUENCE property_type_oid_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.property_type_oid_seq OWNER TO opengeo;
+
+--
+-- Name: property_type_oid_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: opengeo
+--
+
+ALTER SEQUENCE property_type_oid_seq OWNED BY property_type.oid;
+
+
+--
+-- Name: type; Type: TABLE; Schema: public; Owner: opengeo; Tablespace: 
+--
+
+CREATE TABLE type (
+    oid integer NOT NULL,
+    typename character varying(255) NOT NULL
+);
+
+
+ALTER TABLE public.type OWNER TO opengeo;
+
+--
+-- Name: type_oid_seq; Type: SEQUENCE; Schema: public; Owner: opengeo
+--
+
+CREATE SEQUENCE type_oid_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.type_oid_seq OWNER TO opengeo;
+
+--
+-- Name: type_oid_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: opengeo
+--
+
+ALTER SEQUENCE type_oid_seq OWNED BY type.oid;
+
+
+--
+-- Name: oid; Type: DEFAULT; Schema: public; Owner: opengeo
+--
+
+ALTER TABLE ONLY object ALTER COLUMN oid SET DEFAULT nextval(&apos;object_oid_seq&apos;::regclass);
+
+
+--
+-- Name: oid; Type: DEFAULT; Schema: public; Owner: opengeo
+--
+
+ALTER TABLE ONLY property_type ALTER COLUMN oid SET DEFAULT nextval(&apos;property_type_oid_seq&apos;::regclass);
+
+
+--
+-- Name: oid; Type: DEFAULT; Schema: public; Owner: opengeo
+--
+
+ALTER TABLE ONLY type ALTER COLUMN oid SET DEFAULT nextval(&apos;type_oid_seq&apos;::regclass);
+
+
+--
+-- Data for Name: default_object; Type: TABLE DATA; Schema: public; Owner: opengeo
+--
+
+COPY default_object (def_key, id) FROM stdin;
+NamespaceInfo	NamespaceInfo.708fce93-11bd-4436-9037-ec56b860b835
+WorkspaceInfo	WorkspaceInfo.a39dbe78-e28e-4a9d-a78b-bf2b92de557a
+WorkspaceInfo.WorkspaceInfo.a39dbe78-e28e-4a9d-a78b-bf2b92de557a	DataStoreInfo.1c2bbfe5-6489-48a4-befa-bcc362383932
+\.
+
+
+--
+-- Data for Name: object; Type: TABLE DATA; Schema: public; Owner: opengeo
+--
+
+COPY object (oid, type_id, id, blob) FROM stdin;
+1	14	StyleInfo.4ce7a900-2273-4ebf-a5c8-710fbba3da58	&lt;style&gt;\n  &lt;id&gt;StyleInfo.4ce7a900-2273-4ebf-a5c8-710fbba3da58&lt;/id&gt;\n  &lt;name&gt;point&lt;/name&gt;\n  &lt;sldVersion&gt;\n    &lt;version&gt;1.0.0&lt;/version&gt;\n  &lt;/sldVersion&gt;\n  &lt;filename&gt;default_point.sld&lt;/filename&gt;\n&lt;/style&gt;
+2	14	StyleInfo.9207c8e7-44f1-4ee0-8c1f-c8d50ca0dd02	&lt;style&gt;\n  &lt;id&gt;StyleInfo.9207c8e7-44f1-4ee0-8c1f-c8d50ca0dd02&lt;/id&gt;\n  &lt;name&gt;line&lt;/name&gt;\n  &lt;sldVersion&gt;\n    &lt;version&gt;1.0.0&lt;/version&gt;\n  &lt;/sldVersion&gt;\n  &lt;filename&gt;default_line.sld&lt;/filename&gt;\n&lt;/style&gt;
+3	14	StyleInfo.4178d8d6-44e7-4721-b7d3-93f9c3a63baa	&lt;style&gt;\n  &lt;id&gt;StyleInfo.4178d8d6-44e7-4721-b7d3-93f9c3a63baa&lt;/id&gt;\n  &lt;name&gt;polygon&lt;/name&gt;\n  &lt;sldVersion&gt;\n    &lt;version&gt;1.0.0&lt;/version&gt;\n  &lt;/sldVersion&gt;\n  &lt;filename&gt;default_line.sld&lt;/filename&gt;\n&lt;/style&gt;
+4	14	StyleInfo.1a381191-567d-4030-9f10-223fecc9dd52	&lt;style&gt;\n  &lt;id&gt;StyleInfo.1a381191-567d-4030-9f10-223fecc9dd52&lt;/id&gt;\n  &lt;name&gt;raster&lt;/name&gt;\n  &lt;sldVersion&gt;\n    &lt;version&gt;1.0.0&lt;/version&gt;\n  &lt;/sldVersion&gt;\n  &lt;filename&gt;default_raster.sld&lt;/filename&gt;\n&lt;/style&gt;
+5	17	SettingsInfo.-797aa7f4:13c40955650:-8000	&lt;settings&gt;\n  &lt;id&gt;SettingsInfo.-797aa7f4:13c40955650:-8000&lt;/id&gt;\n  &lt;contact&gt;\n    &lt;id&gt;contact&lt;/id&gt;\n  &lt;/contact&gt;\n  &lt;charset&gt;UTF-8&lt;/charset&gt;\n  &lt;numDecimals&gt;4&lt;/numDecimals&gt;\n  &lt;verbose&gt;true&lt;/verbose&gt;\n  &lt;verboseExceptions&gt;false&lt;/verboseExceptions&gt;\n&lt;/settings&gt;
+7	16	LoggingInfo.global	&lt;logging&gt;\n  &lt;id&gt;LoggingInfo.global&lt;/id&gt;\n  &lt;stdOutLogging&gt;false&lt;/stdOutLogging&gt;\n&lt;/logging&gt;
+8	18	ServiceInfo.-797aa7f4:13c40955650:-7fff	&lt;org.geoserver.wcs.WCSInfoImpl&gt;\n  &lt;id&gt;ServiceInfo.-797aa7f4:13c40955650:-7fff&lt;/id&gt;\n  &lt;enabled&gt;true&lt;/enabled&gt;\n  &lt;name&gt;WCS&lt;/name&gt;\n  &lt;citeCompliant&gt;false&lt;/citeCompliant&gt;\n  &lt;schemaBaseURL&gt;http://schemas.opengis.net&lt;/schemaBaseURL&gt;\n  &lt;verbose&gt;false&lt;/verbose&gt;\n  &lt;gmlPrefixing&gt;false&lt;/gmlPrefixing&gt;\n  &lt;latLon&gt;false&lt;/latLon&gt;\n  &lt;maxInputMemory&gt;-1&lt;/maxInputMemory&gt;\n  &lt;maxOutputMemory&gt;-1&lt;/maxOutputMemory&gt;\n  &lt;subsamplingEnabled&gt;true&lt;/subsamplingEnabled&gt;\n&lt;/org.geoserver.wcs.WCSInfoImpl&gt;
+9	18	ServiceInfo.-797aa7f4:13c40955650:-7ffe	&lt;org.geoserver.wfs.WFSInfoImpl&gt;\n  &lt;id&gt;ServiceInfo.-797aa7f4:13c40955650:-7ffe&lt;/id&gt;\n  &lt;enabled&gt;true&lt;/enabled&gt;\n  &lt;name&gt;WFS&lt;/name&gt;\n  &lt;citeCompliant&gt;false&lt;/citeCompliant&gt;\n  &lt;schemaBaseURL&gt;http://schemas.opengis.net&lt;/schemaBaseURL&gt;\n  &lt;verbose&gt;false&lt;/verbose&gt;\n  &lt;gml&gt;\n    &lt;entry&gt;\n      &lt;org.geoserver.wfs.WFSInfo_-Version&gt;V_10&lt;/org.geoserver.wfs.WFSInfo_-Version&gt;\n      &lt;org.geoserver.wfs.GMLInfoImpl&gt;\n        &lt;srsNameStyle&gt;XML&lt;/srsNameStyle&gt;\n        &lt;overrideGMLAttributes&gt;true&lt;/overrideGMLAttributes&gt;\n      &lt;/org.geoserver.wfs.GMLInfoImpl&gt;\n    &lt;/entry&gt;\n    &lt;entry&gt;\n      &lt;org.geoserver.wfs.WFSInfo_-Version&gt;V_11&lt;/org.geoserver.wfs.WFSInfo_-Version&gt;\n      &lt;org.geoserver.wfs.GMLInfoImpl&gt;\n        &lt;srsNameStyle&gt;URN&lt;/srsNameStyle&gt;\n        &lt;overrideGMLAttributes&gt;false&lt;/overrideGMLAttributes&gt;\n      &lt;/org.geoserver.wfs.GMLInfoImpl&gt;\n    &lt;/entry&gt;\n  &lt;/gml&gt;\n  &lt;serviceLevel&gt;COMPLETE&lt;/serviceLevel&gt;\n  &lt;maxFeatures&gt;1000000&lt;/maxFeatures&gt;\n  &lt;featureBounding&gt;true&lt;/
+featureBounding&gt;\n  &lt;canonicalSchemaLocation&gt;false&lt;/canonicalSchemaLocation&gt;\n  &lt;encodeFeatureMember&gt;false&lt;/encodeFeatureMember&gt;\n&lt;/org.geoserver.wfs.WFSInfoImpl&gt;
+10	18	ServiceInfo.-797aa7f4:13c40955650:-7ffd	&lt;org.geoserver.wms.WMSInfoImpl&gt;\n  &lt;id&gt;ServiceInfo.-797aa7f4:13c40955650:-7ffd&lt;/id&gt;\n  &lt;enabled&gt;true&lt;/enabled&gt;\n  &lt;name&gt;WMS&lt;/name&gt;\n  &lt;citeCompliant&gt;false&lt;/citeCompliant&gt;\n  &lt;schemaBaseURL&gt;http://schemas.opengis.net&lt;/schemaBaseURL&gt;\n  &lt;verbose&gt;false&lt;/verbose&gt;\n  &lt;watermark class=&quot;org.geoserver.wms.WatermarkInfoImpl&quot;&gt;\n    &lt;enabled&gt;false&lt;/enabled&gt;\n    &lt;position&gt;BOT_RIGHT&lt;/position&gt;\n    &lt;transparency&gt;100&lt;/transparency&gt;\n  &lt;/watermark&gt;\n  &lt;maxBuffer&gt;0&lt;/maxBuffer&gt;\n  &lt;maxRequestMemory&gt;0&lt;/maxRequestMemory&gt;\n  &lt;maxRenderingTime&gt;0&lt;/maxRenderingTime&gt;\n  &lt;maxRenderingErrors&gt;0&lt;/maxRenderingErrors&gt;\n&lt;/org.geoserver.wms.WMSInfoImpl&gt;
+6	15	GeoServerInfo.global	&lt;global&gt;\n  &lt;id&gt;GeoServerInfo.global&lt;/id&gt;\n  &lt;settings&gt;\n    &lt;id&gt;SettingsInfo.-797aa7f4:13c40955650:-8000&lt;/id&gt;\n    &lt;contact&gt;\n      &lt;id&gt;contact&lt;/id&gt;\n    &lt;/contact&gt;\n    &lt;charset&gt;UTF-8&lt;/charset&gt;\n    &lt;numDecimals&gt;4&lt;/numDecimals&gt;\n    &lt;verbose&gt;true&lt;/verbose&gt;\n    &lt;verboseExceptions&gt;false&lt;/verboseExceptions&gt;\n  &lt;/settings&gt;\n  &lt;jai&gt;\n    &lt;allowInterpolation&gt;false&lt;/allowInterpolation&gt;\n    &lt;recycling&gt;false&lt;/recycling&gt;\n    &lt;tilePriority&gt;5&lt;/tilePriority&gt;\n    &lt;tileThreads&gt;7&lt;/tileThreads&gt;\n    &lt;memoryCapacity&gt;0.5&lt;/memoryCapacity&gt;\n    &lt;memoryThreshold&gt;0.75&lt;/memoryThreshold&gt;\n    &lt;imageIOCache&gt;false&lt;/imageIOCache&gt;\n    &lt;pngAcceleration&gt;false&lt;/pngAcceleration&gt;\n    &lt;jpegAcceleration&gt;false&lt;/jpegAcceleration&gt;\n    &lt;allowNativeMosaic&gt;false&lt;/allowNativeMosaic&gt;\n  &lt;/jai&gt;\n  &lt;coverageAccess&gt;\n    &lt;maxPoolSize&gt;5&lt;/maxPoolSize&gt;\n    &lt;corePoolSize&gt;5&lt;/corePoolSize&gt;\n    &lt;keepAliveTime&gt;30000&lt;/keepAliveTime&gt;\n    &lt;queueType&gt;UNBOUNDED&lt;/queueType&gt;\n    &lt;imageIOCacheThreshold&gt;10240&lt;/imageIOCacheThreshold&gt;\
+n  &lt;/coverageAccess&gt;\n  &lt;updateSequence&gt;7&lt;/updateSequence&gt;\n  &lt;featureTypeCacheSize&gt;0&lt;/featureTypeCacheSize&gt;\n  &lt;globalServices&gt;true&lt;/globalServices&gt;\n  &lt;xmlPostRequestLogBufferSize&gt;1024&lt;/xmlPostRequestLogBufferSize&gt;\n&lt;/global&gt;
+12	1	WorkspaceInfo.a39dbe78-e28e-4a9d-a78b-bf2b92de557a	&lt;workspace&gt;\n  &lt;id&gt;WorkspaceInfo.a39dbe78-e28e-4a9d-a78b-bf2b92de557a&lt;/id&gt;\n  &lt;name&gt;naturalearth&lt;/name&gt;\n&lt;/workspace&gt;
+14	3	DataStoreInfo.1c2bbfe5-6489-48a4-befa-bcc362383932	&lt;dataStore&gt;\n  &lt;id&gt;DataStoreInfo.1c2bbfe5-6489-48a4-befa-bcc362383932&lt;/id&gt;\n  &lt;name&gt;wfs_t&lt;/name&gt;\n  &lt;type&gt;PostGIS&lt;/type&gt;\n  &lt;enabled&gt;true&lt;/enabled&gt;\n  &lt;workspace&gt;\n    &lt;id&gt;WorkspaceInfo.a39dbe78-e28e-4a9d-a78b-bf2b92de557a&lt;/id&gt;\n  &lt;/workspace&gt;\n  &lt;connectionParameters&gt;\n    &lt;entry key=&quot;Connection timeout&quot;&gt;20&lt;/entry&gt;\n    &lt;entry key=&quot;port&quot;&gt;5432&lt;/entry&gt;\n    &lt;entry key=&quot;passwd&quot;&gt;crypt1:eq05i1FN4mAYcbRaRTWF11Far/Doetsn&lt;/entry&gt;\n    &lt;entry key=&quot;dbtype&quot;&gt;postgis&lt;/entry&gt;\n    &lt;entry key=&quot;host&quot;&gt;scale-db.dev.opengeo.org&lt;/entry&gt;\n    &lt;entry key=&quot;validate connections&quot;&gt;true&lt;/entry&gt;\n    &lt;entry key=&quot;encode functions&quot;&gt;false&lt;/entry&gt;\n    &lt;entry key=&quot;max connections&quot;&gt;10&lt;/entry&gt;\n    &lt;entry key=&quot;database&quot;&gt;wfs_t&lt;/entry&gt;\n    &lt;entry key=&quot;namespace&quot;&gt;http://www.naturalearth.org&lt;/entry&gt;\n    &lt;entry key=&quot;schema&quot;&gt;public&lt;/entry&gt;\n    &lt;entry key=&quot;Loose bbox&quot;&gt;true&lt;/entry&gt;\n    &lt;entry key=&quot;Expose primary keys&quot;&gt;false&lt;/entry&gt;\n    &lt;entry key=&quot;fetch size&quot;&gt;1000&lt;/entry&gt;\n    &lt;entry key=&quot;
+Max open prepared statements&quot;&gt;50&lt;/entry&gt;\n    &lt;entry key=&quot;preparedStatements&quot;&gt;false&lt;/entry&gt;\n    &lt;entry key=&quot;Estimated extends&quot;&gt;true&lt;/entry&gt;\n    &lt;entry key=&quot;user&quot;&gt;opengeo&lt;/entry&gt;\n    &lt;entry key=&quot;min connections&quot;&gt;1&lt;/entry&gt;\n  &lt;/connectionParameters&gt;\n  &lt;__default&gt;false&lt;/__default&gt;\n&lt;/dataStore&gt;
+13	2	NamespaceInfo.708fce93-11bd-4436-9037-ec56b860b835	&lt;namespace&gt;\n  &lt;id&gt;NamespaceInfo.708fce93-11bd-4436-9037-ec56b860b835&lt;/id&gt;\n  &lt;prefix&gt;naturalearth&lt;/prefix&gt;\n  &lt;uri&gt;http://www.naturalearth.org&lt;/uri&gt;\n&lt;/namespace&gt;
+15	7	FeatureTypeInfo.60d77781-e3bb-42eb-932a-5b8fd9ee6412	&lt;featureType&gt;\n  &lt;id&gt;FeatureTypeInfo.60d77781-e3bb-42eb-932a-5b8fd9ee6412&lt;/id&gt;\n  &lt;name&gt;wfs_roads&lt;/name&gt;\n  &lt;nativeName&gt;wfs_roads&lt;/nativeName&gt;\n  &lt;namespace&gt;\n    &lt;id&gt;NamespaceInfo.708fce93-11bd-4436-9037-ec56b860b835&lt;/id&gt;\n  &lt;/namespace&gt;\n  &lt;title&gt;wfs_roads&lt;/title&gt;\n  &lt;keywords&gt;\n    &lt;string&gt;wfs_roads&lt;/string&gt;\n    &lt;string&gt;features&lt;/string&gt;\n  &lt;/keywords&gt;\n  &lt;nativeCRS&gt;GEOGCS[&amp;quot;WGS 84&amp;quot;, \n  DATUM[&amp;quot;World Geodetic System 1984&amp;quot;, \n    SPHEROID[&amp;quot;WGS 84&amp;quot;, 6378137.0, 298.257223563, AUTHORITY[&amp;quot;EPSG&amp;quot;,&amp;quot;7030&amp;quot;]], \n    AUTHORITY[&amp;quot;EPSG&amp;quot;,&amp;quot;6326&amp;quot;]], \n  PRIMEM[&amp;quot;Greenwich&amp;quot;, 0.0, AUTHORITY[&amp;quot;EPSG&amp;quot;,&amp;quot;8901&amp;quot;]], \n  UNIT[&amp;quot;degree&amp;quot;, 0.017453292519943295], \n  AXIS[&amp;quot;Geodetic longitude&amp;quot;, EAST], \n  AXIS[&amp;quot;Geodetic latitude&amp;quot;, NORTH], \n  AUTHORITY[&amp;quot;EPSG&amp;quot;,&amp;quot;4326&amp;quot;]]&lt;/nativeCRS&gt;\n  &lt;srs&gt;EPSG:4326&lt;/srs&gt;\n  &lt;nativeBoundingBox&gt;\n    &lt;minx&gt;-
+180.0&lt;/minx&gt;\n    &lt;maxx&gt;180.0&lt;/maxx&gt;\n    &lt;miny&gt;-90.0&lt;/miny&gt;\n    &lt;maxy&gt;90.0&lt;/maxy&gt;\n  &lt;/nativeBoundingBox&gt;\n  &lt;latLonBoundingBox&gt;\n    &lt;minx&gt;-180.0&lt;/minx&gt;\n    &lt;maxx&gt;180.0&lt;/maxx&gt;\n    &lt;miny&gt;-90.0&lt;/miny&gt;\n    &lt;maxy&gt;90.0&lt;/maxy&gt;\n    &lt;crs&gt;GEOGCS[&amp;quot;WGS84(DD)&amp;quot;, \n  DATUM[&amp;quot;WGS84&amp;quot;, \n    SPHEROID[&amp;quot;WGS84&amp;quot;, 6378137.0, 298.257223563]], \n  PRIMEM[&amp;quot;Greenwich&amp;quot;, 0.0], \n  UNIT[&amp;quot;degree&amp;quot;, 0.017453292519943295], \n  AXIS[&amp;quot;Geodetic longitude&amp;quot;, EAST], \n  AXIS[&amp;quot;Geodetic latitude&amp;quot;, NORTH]]&lt;/crs&gt;\n  &lt;/latLonBoundingBox&gt;\n  &lt;projectionPolicy&gt;FORCE_DECLARED&lt;/projectionPolicy&gt;\n  &lt;enabled&gt;true&lt;/enabled&gt;\n  &lt;metadata&gt;\n    &lt;entry key=&quot;cachingEnabled&quot;&gt;false&lt;/entry&gt;\n  &lt;/metadata&gt;\n  &lt;store class=&quot;dataStore&quot;&gt;\n    &lt;id&gt;DataStoreInfo.1c2bbfe5-6489-48a4-befa-bcc362383932&lt;/id&gt;\n  &lt;/store&gt;\n  &lt;maxFeatures&gt;0&lt;/maxFeatures&gt;\n  &lt;numDecimals&gt;0&lt;/numDecimals&gt;\n&lt;/featureType&gt;
+16	11	LayerInfo.17028ac8-135f-4e03-a619-e5226f8f7464	&lt;layer&gt;\n  &lt;name&gt;wfs_roads&lt;/name&gt;\n  &lt;id&gt;LayerInfo.17028ac8-135f-4e03-a619-e5226f8f7464&lt;/id&gt;\n  &lt;type&gt;VECTOR&lt;/type&gt;\n  &lt;defaultStyle&gt;\n    &lt;id&gt;StyleInfo.9207c8e7-44f1-4ee0-8c1f-c8d50ca0dd02&lt;/id&gt;\n  &lt;/defaultStyle&gt;\n  &lt;resource class=&quot;featureType&quot;&gt;\n    &lt;id&gt;FeatureTypeInfo.60d77781-e3bb-42eb-932a-5b8fd9ee6412&lt;/id&gt;\n  &lt;/resource&gt;\n  &lt;enabled&gt;true&lt;/enabled&gt;\n  &lt;attribution&gt;\n    &lt;logoWidth&gt;0&lt;/logoWidth&gt;\n    &lt;logoHeight&gt;0&lt;/logoHeight&gt;\n  &lt;/attribution&gt;\n&lt;/layer&gt;
+11	18	ServiceInfo.-797aa7f4:13c40955650:-7ffc	&lt;org.geoserver.wps.WPSInfoImpl&gt;\n  &lt;id&gt;ServiceInfo.-797aa7f4:13c40955650:-7ffc&lt;/id&gt;\n  &lt;enabled&gt;true&lt;/enabled&gt;\n  &lt;citeCompliant&gt;false&lt;/citeCompliant&gt;\n  &lt;schemaBaseURL&gt;http://schemas.opengis.net&lt;/schemaBaseURL&gt;\n  &lt;verbose&gt;false&lt;/verbose&gt;\n  &lt;connectionTimeout&gt;30.0&lt;/connectionTimeout&gt;\n  &lt;resourceExpirationTimeout&gt;300&lt;/resourceExpirationTimeout&gt;\n  &lt;maxSynchronousProcesses&gt;8&lt;/maxSynchronousProcesses&gt;\n  &lt;maxAsynchronousProcesses&gt;8&lt;/maxAsynchronousProcesses&gt;\n  &lt;processGroups&gt;\n    &lt;org.geoserver.wps.ProcessGroupInfoImpl&gt;\n      &lt;factoryClass&gt;org.geoserver.script.wps.ScriptProcessFactory&lt;/factoryClass&gt;\n      &lt;enabled&gt;true&lt;/enabled&gt;\n    &lt;/org.geoserver.wps.ProcessGroupInfoImpl&gt;\n    &lt;org.geoserver.wps.ProcessGroupInfoImpl&gt;\n      &lt;factoryClass&gt;org.geoserver.wps.DeprecatedProcessFactory&lt;/factoryClass&gt;\n      &lt;enabled&gt;true&lt;/enabled&gt;\n    &lt;/org.geoserver.wps.ProcessGroupInfoImpl&gt;\n    &lt;org.geoserver.wps.ProcessGroupInfoImpl&gt;\n      &lt;factoryClass&gt;org.geoserver.wps.
+jts.SpringBeanProcessFactory&lt;/factoryClass&gt;\n      &lt;enabled&gt;true&lt;/enabled&gt;\n    &lt;/org.geoserver.wps.ProcessGroupInfoImpl&gt;\n    &lt;org.geoserver.wps.ProcessGroupInfoImpl&gt;\n      &lt;factoryClass&gt;org.geotools.process.geometry.GeometryProcessFactory&lt;/factoryClass&gt;\n      &lt;enabled&gt;true&lt;/enabled&gt;\n    &lt;/org.geoserver.wps.ProcessGroupInfoImpl&gt;\n    &lt;org.geoserver.wps.ProcessGroupInfoImpl&gt;\n      &lt;factoryClass&gt;org.geotools.process.raster.RasterProcessFactory&lt;/factoryClass&gt;\n      &lt;enabled&gt;true&lt;/enabled&gt;\n    &lt;/org.geoserver.wps.ProcessGroupInfoImpl&gt;\n    &lt;org.geoserver.wps.ProcessGroupInfoImpl&gt;\n      &lt;factoryClass&gt;org.geotools.process.vector.VectorProcessFactory&lt;/factoryClass&gt;\n      &lt;enabled&gt;true&lt;/enabled&gt;\n    &lt;/org.geoserver.wps.ProcessGroupInfoImpl&gt;\n  &lt;/processGroups&gt;\n&lt;/org.geoserver.wps.WPSInfoImpl&gt;
+\.
+
+
+--
+-- Name: object_oid_seq; Type: SEQUENCE SET; Schema: public; Owner: opengeo
+--
+
+SELECT pg_catalog.setval(&apos;object_oid_seq&apos;, 16, true);
+
+
+--
+-- Data for Name: object_property; Type: TABLE DATA; Schema: public; Owner: opengeo
+--
+
+COPY object_property (oid, property_type, id, related_oid, related_property_type, colindex, value) FROM stdin;
+1	98	StyleInfo.4ce7a900-2273-4ebf-a5c8-710fbba3da58	\N	\N	0	StyleInfo.4ce7a900-2273-4ebf-a5c8-710fbba3da58
+1	192	StyleInfo.4ce7a900-2273-4ebf-a5c8-710fbba3da58	\N	\N	0	\N
+1	99	StyleInfo.4ce7a900-2273-4ebf-a5c8-710fbba3da58	\N	\N	0	point
+1	97	StyleInfo.4ce7a900-2273-4ebf-a5c8-710fbba3da58	\N	\N	0	default_point.sld
+1	193	StyleInfo.4ce7a900-2273-4ebf-a5c8-710fbba3da58	\N	\N	0	\N
+2	98	StyleInfo.9207c8e7-44f1-4ee0-8c1f-c8d50ca0dd02	\N	\N	0	StyleInfo.9207c8e7-44f1-4ee0-8c1f-c8d50ca0dd02
+2	192	StyleInfo.9207c8e7-44f1-4ee0-8c1f-c8d50ca0dd02	\N	\N	0	\N
+2	99	StyleInfo.9207c8e7-44f1-4ee0-8c1f-c8d50ca0dd02	\N	\N	0	line
+2	97	StyleInfo.9207c8e7-44f1-4ee0-8c1f-c8d50ca0dd02	\N	\N	0	default_line.sld
+2	193	StyleInfo.9207c8e7-44f1-4ee0-8c1f-c8d50ca0dd02	\N	\N	0	\N
+3	98	StyleInfo.4178d8d6-44e7-4721-b7d3-93f9c3a63baa	\N	\N	0	StyleInfo.4178d8d6-44e7-4721-b7d3-93f9c3a63baa
+3	192	StyleInfo.4178d8d6-44e7-4721-b7d3-93f9c3a63baa	\N	\N	0	\N
+3	99	StyleInfo.4178d8d6-44e7-4721-b7d3-93f9c3a63baa	\N	\N	0	polygon
+3	97	StyleInfo.4178d8d6-44e7-4721-b7d3-93f9c3a63baa	\N	\N	0	default_line.sld
+3	193	StyleInfo.4178d8d6-44e7-4721-b7d3-93f9c3a63baa	\N	\N	0	\N
+4	98	StyleInfo.1a381191-567d-4030-9f10-223fecc9dd52	\N	\N	0	StyleInfo.1a381191-567d-4030-9f10-223fecc9dd52
+4	192	StyleInfo.1a381191-567d-4030-9f10-223fecc9dd52	\N	\N	0	\N
+4	99	StyleInfo.1a381191-567d-4030-9f10-223fecc9dd52	\N	\N	0	raster
+4	97	StyleInfo.1a381191-567d-4030-9f10-223fecc9dd52	\N	\N	0	default_raster.sld
+4	193	StyleInfo.1a381191-567d-4030-9f10-223fecc9dd52	\N	\N	0	\N
+5	123	SettingsInfo.-797aa7f4:13c40955650:-8000	\N	\N	0	\N
+5	124	SettingsInfo.-797aa7f4:13c40955650:-8000	\N	\N	0	\N
+5	128	SettingsInfo.-797aa7f4:13c40955650:-8000	\N	\N	0	false
+5	122	SettingsInfo.-797aa7f4:13c40955650:-8000	\N	\N	0	4
+5	197	SettingsInfo.-797aa7f4:13c40955650:-8000	\N	\N	0	\N
+5	200	SettingsInfo.-797aa7f4:13c40955650:-8000	\N	\N	0	\N
+5	120	SettingsInfo.-797aa7f4:13c40955650:-8000	\N	\N	0	UTF-8
+5	199	SettingsInfo.-797aa7f4:13c40955650:-8000	\N	\N	0	\N
+5	121	SettingsInfo.-797aa7f4:13c40955650:-8000	\N	\N	0	SettingsInfo.-797aa7f4:13c40955650:-8000
+5	126	SettingsInfo.-797aa7f4:13c40955650:-8000	\N	\N	0	\N
+5	127	SettingsInfo.-797aa7f4:13c40955650:-8000	\N	\N	0	true
+5	125	SettingsInfo.-797aa7f4:13c40955650:-8000	\N	\N	0	\N
+5	198	SettingsInfo.-797aa7f4:13c40955650:-8000	\N	\N	0	\N
+6	195	GeoServerInfo.global	\N	\N	0	\N
+6	101	GeoServerInfo.global	\N	\N	0	\N
+6	107	GeoServerInfo.global	\N	\N	0	\N
+6	114	GeoServerInfo.global	\N	\N	0	false
+6	108	GeoServerInfo.global	\N	\N	0	\N
+6	106	GeoServerInfo.global	\N	\N	0	4
+6	194	GeoServerInfo.global	\N	\N	0	\N
+6	102	GeoServerInfo.global	\N	\N	0	UTF-8
+6	104	GeoServerInfo.global	\N	\N	0	true
+6	103	GeoServerInfo.global	\N	\N	0	0
+6	105	GeoServerInfo.global	\N	\N	0	GeoServerInfo.global
+6	111	GeoServerInfo.global	\N	\N	0	\N
+6	109	GeoServerInfo.global	\N	\N	0	\N
+6	100	GeoServerInfo.global	\N	\N	0	\N
+6	196	GeoServerInfo.global	5	121	0	SettingsInfo.-797aa7f4:13c40955650:-8000
+6	113	GeoServerInfo.global	\N	\N	0	true
+6	110	GeoServerInfo.global	\N	\N	0	\N
+6	115	GeoServerInfo.global	\N	\N	0	1024
+7	116	LoggingInfo.global	\N	\N	0	LoggingInfo.global
+7	117	LoggingInfo.global	\N	\N	0	\N
+7	118	LoggingInfo.global	\N	\N	0	\N
+7	119	LoggingInfo.global	\N	\N	0	false
+8	129	ServiceInfo.-797aa7f4:13c40955650:-7fff	\N	\N	0	\N
+8	132	ServiceInfo.-797aa7f4:13c40955650:-7fff	\N	\N	0	true
+8	137	ServiceInfo.-797aa7f4:13c40955650:-7fff	\N	\N	0	\N
+8	131	ServiceInfo.-797aa7f4:13c40955650:-7fff	\N	\N	0	false
+8	202	ServiceInfo.-797aa7f4:13c40955650:-7fff	\N	\N	0	\N
+8	133	ServiceInfo.-797aa7f4:13c40955650:-7fff	\N	\N	0	\N
+8	139	ServiceInfo.-797aa7f4:13c40955650:-7fff	\N	\N	0	http://schemas.opengis.net
+8	201	ServiceInfo.-797aa7f4:13c40955650:-7fff	\N	\N	0	\N
+8	135	ServiceInfo.-797aa7f4:13c40955650:-7fff	\N	\N	0	\N
+8	134	ServiceInfo.-797aa7f4:13c40955650:-7fff	\N	\N	0	ServiceInfo.-797aa7f4:13c40955650:-7fff
+8	140	ServiceInfo.-797aa7f4:13c40955650:-7fff	\N	\N	0	\N
+8	141	ServiceInfo.-797aa7f4:13c40955650:-7fff	\N	\N	0	false
+8	136	ServiceInfo.-797aa7f4:13c40955650:-7fff	\N	\N	0	WCS
+8	138	ServiceInfo.-797aa7f4:13c40955650:-7fff	\N	\N	0	\N
+8	130	ServiceInfo.-797aa7f4:13c40955650:-7fff	\N	\N	0	\N
+9	129	ServiceInfo.-797aa7f4:13c40955650:-7ffe	\N	\N	0	\N
+9	132	ServiceInfo.-797aa7f4:13c40955650:-7ffe	\N	\N	0	true
+9	137	ServiceInfo.-797aa7f4:13c40955650:-7ffe	\N	\N	0	\N
+9	131	ServiceInfo.-797aa7f4:13c40955650:-7ffe	\N	\N	0	false
+9	202	ServiceInfo.-797aa7f4:13c40955650:-7ffe	\N	\N	0	\N
+9	133	ServiceInfo.-797aa7f4:13c40955650:-7ffe	\N	\N	0	\N
+9	139	ServiceInfo.-797aa7f4:13c40955650:-7ffe	\N	\N	0	http://schemas.opengis.net
+9	201	ServiceInfo.-797aa7f4:13c40955650:-7ffe	\N	\N	0	\N
+9	135	ServiceInfo.-797aa7f4:13c40955650:-7ffe	\N	\N	0	\N
+9	134	ServiceInfo.-797aa7f4:13c40955650:-7ffe	\N	\N	0	ServiceInfo.-797aa7f4:13c40955650:-7ffe
+9	140	ServiceInfo.-797aa7f4:13c40955650:-7ffe	\N	\N	0	\N
+9	141	ServiceInfo.-797aa7f4:13c40955650:-7ffe	\N	\N	0	false
+9	136	ServiceInfo.-797aa7f4:13c40955650:-7ffe	\N	\N	0	WFS
+9	138	ServiceInfo.-797aa7f4:13c40955650:-7ffe	\N	\N	0	\N
+9	130	ServiceInfo.-797aa7f4:13c40955650:-7ffe	\N	\N	0	\N
+10	129	ServiceInfo.-797aa7f4:13c40955650:-7ffd	\N	\N	0	\N
+10	132	ServiceInfo.-797aa7f4:13c40955650:-7ffd	\N	\N	0	true
+10	137	ServiceInfo.-797aa7f4:13c40955650:-7ffd	\N	\N	0	\N
+10	131	ServiceInfo.-797aa7f4:13c40955650:-7ffd	\N	\N	0	false
+10	202	ServiceInfo.-797aa7f4:13c40955650:-7ffd	\N	\N	0	\N
+10	133	ServiceInfo.-797aa7f4:13c40955650:-7ffd	\N	\N	0	\N
+10	139	ServiceInfo.-797aa7f4:13c40955650:-7ffd	\N	\N	0	http://schemas.opengis.net
+10	201	ServiceInfo.-797aa7f4:13c40955650:-7ffd	\N	\N	0	\N
+10	135	ServiceInfo.-797aa7f4:13c40955650:-7ffd	\N	\N	0	\N
+10	134	ServiceInfo.-797aa7f4:13c40955650:-7ffd	\N	\N	0	ServiceInfo.-797aa7f4:13c40955650:-7ffd
+10	140	ServiceInfo.-797aa7f4:13c40955650:-7ffd	\N	\N	0	\N
+10	141	ServiceInfo.-797aa7f4:13c40955650:-7ffd	\N	\N	0	false
+10	136	ServiceInfo.-797aa7f4:13c40955650:-7ffd	\N	\N	0	WMS
+10	138	ServiceInfo.-797aa7f4:13c40955650:-7ffd	\N	\N	0	\N
+10	130	ServiceInfo.-797aa7f4:13c40955650:-7ffd	\N	\N	0	\N
+11	129	ServiceInfo.-797aa7f4:13c40955650:-7ffc	\N	\N	0	\N
+11	132	ServiceInfo.-797aa7f4:13c40955650:-7ffc	\N	\N	0	true
+11	137	ServiceInfo.-797aa7f4:13c40955650:-7ffc	\N	\N	0	\N
+11	131	ServiceInfo.-797aa7f4:13c40955650:-7ffc	\N	\N	0	false
+11	202	ServiceInfo.-797aa7f4:13c40955650:-7ffc	\N	\N	0	\N
+11	133	ServiceInfo.-797aa7f4:13c40955650:-7ffc	\N	\N	0	\N
+11	139	ServiceInfo.-797aa7f4:13c40955650:-7ffc	\N	\N	0	http://schemas.opengis.net
+11	201	ServiceInfo.-797aa7f4:13c40955650:-7ffc	\N	\N	0	\N
+11	135	ServiceInfo.-797aa7f4:13c40955650:-7ffc	\N	\N	0	\N
+11	134	ServiceInfo.-797aa7f4:13c40955650:-7ffc	\N	\N	0	ServiceInfo.-797aa7f4:13c40955650:-7ffc
+11	140	ServiceInfo.-797aa7f4:13c40955650:-7ffc	\N	\N	0	Prototype GeoServer WPS
+11	141	ServiceInfo.-797aa7f4:13c40955650:-7ffc	\N	\N	0	false
+11	136	ServiceInfo.-797aa7f4:13c40955650:-7ffc	\N	\N	0	\N
+11	138	ServiceInfo.-797aa7f4:13c40955650:-7ffc	\N	\N	0	\N
+11	130	ServiceInfo.-797aa7f4:13c40955650:-7ffc	\N	\N	0	\N
+12	1	WorkspaceInfo.a39dbe78-e28e-4a9d-a78b-bf2b92de557a	\N	\N	0	WorkspaceInfo.a39dbe78-e28e-4a9d-a78b-bf2b92de557a
+12	2	WorkspaceInfo.a39dbe78-e28e-4a9d-a78b-bf2b92de557a	\N	\N	0	naturalearth
+13	3	NamespaceInfo.708fce93-11bd-4436-9037-ec56b860b835	\N	\N	0	NamespaceInfo.708fce93-11bd-4436-9037-ec56b860b835
+13	5	NamespaceInfo.708fce93-11bd-4436-9037-ec56b860b835	\N	\N	0	naturalearth
+13	4	NamespaceInfo.708fce93-11bd-4436-9037-ec56b860b835	\N	\N	0	naturalearth
+13	6	NamespaceInfo.708fce93-11bd-4436-9037-ec56b860b835	\N	\N	0	http://www.naturalearth.org
+14	9	DataStoreInfo.1c2bbfe5-6489-48a4-befa-bcc362383932	\N	\N	0	DataStoreInfo.1c2bbfe5-6489-48a4-befa-bcc362383932
+14	8	DataStoreInfo.1c2bbfe5-6489-48a4-befa-bcc362383932	\N	\N	0	true
+14	142	DataStoreInfo.1c2bbfe5-6489-48a4-befa-bcc362383932	12	1	0	WorkspaceInfo.a39dbe78-e28e-4a9d-a78b-bf2b92de557a
+14	7	DataStoreInfo.1c2bbfe5-6489-48a4-befa-bcc362383932	\N	\N	0	\N
+14	10	DataStoreInfo.1c2bbfe5-6489-48a4-befa-bcc362383932	\N	\N	0	wfs_t
+14	11	DataStoreInfo.1c2bbfe5-6489-48a4-befa-bcc362383932	\N	\N	0	PostGIS
+14	143	DataStoreInfo.1c2bbfe5-6489-48a4-befa-bcc362383932	12	2	0	naturalearth
+15	35	FeatureTypeInfo.60d77781-e3bb-42eb-932a-5b8fd9ee6412	\N	\N	0	\N
+15	44	FeatureTypeInfo.60d77781-e3bb-42eb-932a-5b8fd9ee6412	\N	\N	0	naturalearth:wfs_roads
+15	38	FeatureTypeInfo.60d77781-e3bb-42eb-932a-5b8fd9ee6412	\N	\N	0	true
+15	150	FeatureTypeInfo.60d77781-e3bb-42eb-932a-5b8fd9ee6412	14	9	0	DataStoreInfo.1c2bbfe5-6489-48a4-befa-bcc362383932
+15	43	FeatureTypeInfo.60d77781-e3bb-42eb-932a-5b8fd9ee6412	\N	\N	0	0
+15	154	FeatureTypeInfo.60d77781-e3bb-42eb-932a-5b8fd9ee6412	\N	\N	1	wfs_roads
+15	154	FeatureTypeInfo.60d77781-e3bb-42eb-932a-5b8fd9ee6412	\N	\N	2	features
+15	42	FeatureTypeInfo.60d77781-e3bb-42eb-932a-5b8fd9ee6412	\N	\N	0	wfs_roads
+15	36	FeatureTypeInfo.60d77781-e3bb-42eb-932a-5b8fd9ee6412	\N	\N	0	true
+15	149	FeatureTypeInfo.60d77781-e3bb-42eb-932a-5b8fd9ee6412	13	6	0	http://www.naturalearth.org
+15	39	FeatureTypeInfo.60d77781-e3bb-42eb-932a-5b8fd9ee6412	\N	\N	0	FeatureTypeInfo.60d77781-e3bb-42eb-932a-5b8fd9ee6412
+15	148	FeatureTypeInfo.60d77781-e3bb-42eb-932a-5b8fd9ee6412	13	4	0	naturalearth
+15	47	FeatureTypeInfo.60d77781-e3bb-42eb-932a-5b8fd9ee6412	\N	\N	0	wfs_roads
+15	151	FeatureTypeInfo.60d77781-e3bb-42eb-932a-5b8fd9ee6412	13	5	0	naturalearth
+15	37	FeatureTypeInfo.60d77781-e3bb-42eb-932a-5b8fd9ee6412	\N	\N	0	\N
+15	41	FeatureTypeInfo.60d77781-e3bb-42eb-932a-5b8fd9ee6412	\N	\N	0	wfs_roads
+15	153	FeatureTypeInfo.60d77781-e3bb-42eb-932a-5b8fd9ee6412	14	10	0	wfs_t
+15	40	FeatureTypeInfo.60d77781-e3bb-42eb-932a-5b8fd9ee6412	\N	\N	0	0
+15	152	FeatureTypeInfo.60d77781-e3bb-42eb-932a-5b8fd9ee6412	13	3	0	NamespaceInfo.708fce93-11bd-4436-9037-ec56b860b835
+15	45	FeatureTypeInfo.60d77781-e3bb-42eb-932a-5b8fd9ee6412	\N	\N	0	FORCE_DECLARED
+15	46	FeatureTypeInfo.60d77781-e3bb-42eb-932a-5b8fd9ee6412	\N	\N	0	EPSG:4326
+16	182	LayerInfo.17028ac8-135f-4e03-a619-e5226f8f7464	13	3	0	NamespaceInfo.708fce93-11bd-4436-9037-ec56b860b835
+16	180	LayerInfo.17028ac8-135f-4e03-a619-e5226f8f7464	15	39	0	FeatureTypeInfo.60d77781-e3bb-42eb-932a-5b8fd9ee6412
+16	183	LayerInfo.17028ac8-135f-4e03-a619-e5226f8f7464	12	2	0	naturalearth
+16	176	LayerInfo.17028ac8-135f-4e03-a619-e5226f8f7464	12	1	0	WorkspaceInfo.a39dbe78-e28e-4a9d-a78b-bf2b92de557a
+16	83	LayerInfo.17028ac8-135f-4e03-a619-e5226f8f7464	\N	\N	0	true
+16	178	LayerInfo.17028ac8-135f-4e03-a619-e5226f8f7464	15	41	0	wfs_roads
+16	170	LayerInfo.17028ac8-135f-4e03-a619-e5226f8f7464	13	4	0	naturalearth
+16	89	LayerInfo.17028ac8-135f-4e03-a619-e5226f8f7464	\N	\N	0	VECTOR
+16	85	LayerInfo.17028ac8-135f-4e03-a619-e5226f8f7464	\N	\N	0	LayerInfo.17028ac8-135f-4e03-a619-e5226f8f7464
+16	172	LayerInfo.17028ac8-135f-4e03-a619-e5226f8f7464	2	97	0	default_line.sld
+16	86	LayerInfo.17028ac8-135f-4e03-a619-e5226f8f7464	\N	\N	0	wfs_roads
+16	87	LayerInfo.17028ac8-135f-4e03-a619-e5226f8f7464	\N	\N	0	\N
+16	185	LayerInfo.17028ac8-135f-4e03-a619-e5226f8f7464	15	37	0	\N
+6	112	GeoServerInfo.global	\N	\N	0	7
+16	84	LayerInfo.17028ac8-135f-4e03-a619-e5226f8f7464	\N	\N	0	true
+16	173	LayerInfo.17028ac8-135f-4e03-a619-e5226f8f7464	14	9	0	DataStoreInfo.1c2bbfe5-6489-48a4-befa-bcc362383932
+16	184	LayerInfo.17028ac8-135f-4e03-a619-e5226f8f7464	2	99	0	line
+16	174	LayerInfo.17028ac8-135f-4e03-a619-e5226f8f7464	13	6	0	http://www.naturalearth.org
+16	186	LayerInfo.17028ac8-135f-4e03-a619-e5226f8f7464	13	5	0	naturalearth
+16	179	LayerInfo.17028ac8-135f-4e03-a619-e5226f8f7464	14	10	0	wfs_t
+16	171	LayerInfo.17028ac8-135f-4e03-a619-e5226f8f7464	15	46	0	EPSG:4326
+16	181	LayerInfo.17028ac8-135f-4e03-a619-e5226f8f7464	15	35	0	\N
+16	88	LayerInfo.17028ac8-135f-4e03-a619-e5226f8f7464	\N	\N	0	true
+16	175	LayerInfo.17028ac8-135f-4e03-a619-e5226f8f7464	2	98	0	StyleInfo.9207c8e7-44f1-4ee0-8c1f-c8d50ca0dd02
+\.
+
+
+--
+-- Data for Name: property_type; Type: TABLE DATA; Schema: public; Owner: opengeo
+--
+
+COPY property_type (oid, target_property, type_id, name, collection, text) FROM stdin;
+1	\N	1	id	f	f
+2	\N	1	name	f	t
+3	\N	2	id	f	f
+4	\N	2	name	f	t
+5	\N	2	prefix	f	t
+6	\N	2	URI	f	t
+7	\N	3	description	f	t
+8	\N	3	enabled	f	f
+9	\N	3	id	f	f
+10	\N	3	name	f	t
+11	\N	3	type	f	t
+12	\N	4	description	f	t
+13	\N	4	enabled	f	f
+14	\N	4	id	f	f
+15	\N	4	name	f	t
+16	\N	4	type	f	t
+17	\N	4	URL	f	t
+18	\N	5	capabilitiesURL	f	t
+19	\N	5	connectTimeout	f	f
+20	\N	5	description	f	t
+21	\N	5	enabled	f	f
+22	\N	5	id	f	f
+23	\N	5	maxConnections	f	f
+24	\N	5	name	f	t
+25	\N	5	password	f	t
+26	\N	5	readTimeout	f	f
+27	\N	5	type	f	t
+28	\N	5	useConnectionPooling	f	f
+29	\N	5	username	f	t
+30	\N	6	description	f	t
+31	\N	6	enabled	f	f
+32	\N	6	id	f	f
+33	\N	6	name	f	t
+34	\N	6	type	f	t
+35	\N	7	abstract	f	t
+36	\N	7	advertised	f	f
+37	\N	7	description	f	t
+38	\N	7	enabled	f	f
+39	\N	7	id	f	f
+40	\N	7	maxFeatures	f	f
+41	\N	7	name	f	t
+42	\N	7	nativeName	f	t
+43	\N	7	numDecimals	f	f
+44	\N	7	prefixedName	f	t
+45	\N	7	projectionPolicy	f	t
+46	\N	7	SRS	f	t
+47	\N	7	title	f	t
+48	\N	8	abstract	f	t
+49	\N	8	advertised	f	f
+50	\N	8	defaultInterpolationMethod	f	t
+51	\N	8	description	f	t
+52	\N	8	enabled	f	f
+53	\N	8	id	f	f
+54	\N	8	name	f	t
+55	\N	8	nativeFormat	f	t
+56	\N	8	nativeName	f	t
+57	\N	8	prefixedName	f	t
+58	\N	8	projectionPolicy	f	t
+59	\N	8	SRS	f	t
+60	\N	8	title	f	t
+61	\N	9	abstract	f	t
+62	\N	9	advertised	f	f
+63	\N	9	description	f	t
+64	\N	9	enabled	f	f
+65	\N	9	id	f	f
+66	\N	9	name	f	t
+67	\N	9	nativeName	f	t
+68	\N	9	prefixedName	f	t
+69	\N	9	projectionPolicy	f	t
+70	\N	9	SRS	f	t
+71	\N	9	title	f	t
+72	\N	10	abstract	f	t
+73	\N	10	advertised	f	f
+74	\N	10	description	f	t
+75	\N	10	enabled	f	f
+76	\N	10	id	f	f
+77	\N	10	name	f	t
+78	\N	10	nativeName	f	t
+79	\N	10	prefixedName	f	t
+80	\N	10	projectionPolicy	f	t
+81	\N	10	SRS	f	t
+82	\N	10	title	f	t
+83	\N	11	advertised	f	f
+84	\N	11	enabled	f	f
+85	\N	11	id	f	f
+86	\N	11	name	f	t
+87	\N	11	path	f	t
+88	\N	11	queryable	f	f
+89	\N	11	type	f	t
+90	\N	12	abstract	f	t
+91	\N	12	id	f	f
+92	\N	12	name	f	t
+93	\N	12	title	f	t
+94	\N	13	enabled	f	f
+95	\N	13	id	f	f
+96	\N	13	name	f	t
+97	\N	14	filename	f	t
+98	\N	14	id	f	f
+99	\N	14	name	f	t
+100	\N	15	adminPassword	f	t
+101	\N	15	adminUsername	f	t
+102	\N	15	charset	f	t
+103	\N	15	featureTypeCacheSize	f	f
+104	\N	15	globalServices	f	f
+105	\N	15	id	f	f
+106	\N	15	numDecimals	f	f
+107	\N	15	onlineResource	f	t
+108	\N	15	proxyBaseUrl	f	t
+109	\N	15	resourceErrorHandling	f	t
+110	\N	15	schemaBaseUrl	f	t
+111	\N	15	title	f	t
+112	\N	15	updateSequence	f	f
+113	\N	15	verbose	f	f
+114	\N	15	verboseExceptions	f	f
+115	\N	15	xmlPostRequestLogBufferSize	f	f
+116	\N	16	id	f	f
+117	\N	16	level	f	t
+118	\N	16	location	f	t
+119	\N	16	stdOutLogging	f	f
+120	\N	17	charset	f	t
+121	\N	17	id	f	f
+122	\N	17	numDecimals	f	f
+123	\N	17	onlineResource	f	t
+124	\N	17	proxyBaseUrl	f	t
+125	\N	17	schemaBaseUrl	f	t
+126	\N	17	title	f	t
+127	\N	17	verbose	f	f
+128	\N	17	verboseExceptions	f	f
+129	\N	18	abstract	f	t
+130	\N	18	accessConstraints	f	t
+131	\N	18	citeCompliant	f	f
+132	\N	18	enabled	f	f
+133	\N	18	fees	f	t
+134	\N	18	id	f	f
+135	\N	18	maintainer	f	t
+136	\N	18	name	f	t
+137	\N	18	onlineResource	f	t
+138	\N	18	outputStrategy	f	t
+139	\N	18	schemaBaseURL	f	t
+140	\N	18	title	f	t
+141	\N	18	verbose	f	f
+142	1	3	workspace.id	f	f
+143	2	3	workspace.name	f	t
+144	1	4	workspace.id	f	f
+145	2	4	workspace.name	f	f
+146	1	5	workspace.id	f	f
+147	2	5	workspace.name	f	t
+148	4	7	namespace.name	f	t
+149	6	7	namespace.URI	f	f
+150	9	7	store.id	f	f
+151	5	7	namespace.prefix	f	t
+152	3	7	namespace.id	f	f
+153	10	7	store.name	f	t
+154	\N	7	keywords.value	t	f
+155	15	8	store.name	f	t
+156	14	8	store.id	f	f
+157	6	8	namespace.URI	f	f
+158	3	8	namespace.id	f	f
+159	\N	8	keywords.value	t	f
+160	5	8	namespace.prefix	f	t
+161	4	8	namespace.name	f	t
+162	5	9	namespace.prefix	f	t
+163	24	9	store.name	f	t
+164	3	9	namespace.id	f	f
+165	\N	9	keywords.value	t	f
+166	4	9	namespace.name	f	t
+167	6	9	namespace.URI	f	f
+168	22	9	store.id	f	f
+169	99	11	styles.name	t	f
+170	4	11	resource.namespace.name	f	f
+171	81	11	resource.SRS	f	t
+172	97	11	defaultStyle.filename	f	f
+173	32	11	resource.store.id	f	f
+174	6	11	resource.namespace.URI	f	f
+175	98	11	defaultStyle.id	f	f
+176	1	11	resource.store.workspace.id	f	f
+177	97	11	styles.filename	t	f
+178	77	11	resource.name	f	f
+179	33	11	resource.store.name	f	t
+180	76	11	resource.id	f	f
+181	72	11	resource.abstract	f	t
+182	3	11	resource.namespace.id	f	f
+183	2	11	resource.store.workspace.name	f	t
+184	99	11	defaultStyle.name	f	f
+185	74	11	resource.description	f	t
+186	5	11	resource.namespace.prefix	f	f
+187	98	11	styles.id	t	f
+188	2	12	workspace.name	f	t
+189	86	12	layers.name	t	f
+190	85	12	layers.id	t	f
+191	1	12	workspace.id	f	f
+192	1	14	workspace.id	f	f
+193	2	14	workspace.name	f	f
+194	2	15	settings.workspace.name	f	t
+195	1	15	settings.workspace.id	f	f
+196	121	15	settings.id	f	f
+197	1	17	workspace.id	f	f
+198	\N	17	contact.address	f	f
+199	2	17	workspace.name	f	t
+200	\N	17	contact.onlineResource	f	f
+201	2	18	workspace.name	f	t
+202	1	18	workspace.id	f	f
+203	\N	18	keywords.value	t	f
+\.
+
+
+--
+-- Name: property_type_oid_seq; Type: SEQUENCE SET; Schema: public; Owner: opengeo
+--
+
+SELECT pg_catalog.setval(&apos;property_type_oid_seq&apos;, 203, true);
+
+
+--
+-- Data for Name: type; Type: TABLE DATA; Schema: public; Owner: opengeo
+--
+
+COPY type (oid, typename) FROM stdin;
+1	org.geoserver.catalog.WorkspaceInfo
+2	org.geoserver.catalog.NamespaceInfo
+3	org.geoserver.catalog.DataStoreInfo
+4	org.geoserver.catalog.CoverageStoreInfo
+5	org.geoserver.catalog.WMSStoreInfo
+6	org.geoserver.catalog.StoreInfo
+7	org.geoserver.catalog.FeatureTypeInfo
+8	org.geoserver.catalog.CoverageInfo
+9	org.geoserver.catalog.WMSLayerInfo
+10	org.geoserver.catalog.ResourceInfo
+11	org.geoserver.catalog.LayerInfo
+12	org.geoserver.catalog.LayerGroupInfo
+13	org.geoserver.catalog.MapInfo
+14	org.geoserver.catalog.StyleInfo
+15	org.geoserver.config.GeoServerInfo
+16	org.geoserver.config.LoggingInfo
+17	org.geoserver.config.SettingsInfo
+18	org.geoserver.config.ServiceInfo
+\.
+
+
+--
+-- Name: type_oid_seq; Type: SEQUENCE SET; Schema: public; Owner: opengeo
+--
+
+SELECT pg_catalog.setval(&apos;type_oid_seq&apos;, 18, true);
+
+
+--
+-- Name: object_pkey; Type: CONSTRAINT; Schema: public; Owner: opengeo; Tablespace: 
+--
+
+ALTER TABLE ONLY object
+    ADD CONSTRAINT object_pkey PRIMARY KEY (oid);
+
+
+--
+-- Name: object_property_pkey; Type: CONSTRAINT; Schema: public; Owner: opengeo; Tablespace: 
+--
+
+ALTER TABLE ONLY object_property
+    ADD CONSTRAINT object_property_pkey PRIMARY KEY (oid, property_type, colindex);
+
+
+--
+-- Name: property_type_pkey; Type: CONSTRAINT; Schema: public; Owner: opengeo; Tablespace: 
+--
+
+ALTER TABLE ONLY property_type
+    ADD CONSTRAINT property_type_pkey PRIMARY KEY (oid);
+
+
+--
+-- Name: type_pkey; Type: CONSTRAINT; Schema: public; Owner: opengeo; Tablespace: 
+--
+
+ALTER TABLE ONLY type
+    ADD CONSTRAINT type_pkey PRIMARY KEY (oid);
+
+
+--
+-- Name: default_object_def_key; Type: INDEX; Schema: public; Owner: opengeo; Tablespace: 
+--
+
+CREATE INDEX default_object_def_key ON default_object USING btree (def_key);
+
+
+--
+-- Name: default_object_id; Type: INDEX; Schema: public; Owner: opengeo; Tablespace: 
+--
+
+CREATE INDEX default_object_id ON default_object USING btree (id);
+
+
+--
+-- Name: object_id; Type: INDEX; Schema: public; Owner: opengeo; Tablespace: 
+--
+
+CREATE UNIQUE INDEX object_id ON object USING btree (id);
+
+
+--
+-- Name: object_oid; Type: INDEX; Schema: public; Owner: opengeo; Tablespace: 
+--
+
+CREATE UNIQUE INDEX object_oid ON object USING btree (oid);
+
+
+--
+-- Name: object_property_colindex; Type: INDEX; Schema: public; Owner: opengeo; Tablespace: 
+--
+
+CREATE INDEX object_property_colindex ON object_property USING btree (colindex);
+
+
+--
+-- Name: object_property_id; Type: INDEX; Schema: public; Owner: opengeo; Tablespace: 
+--
+
+CREATE INDEX object_property_id ON object_property USING btree (id);
+
+
+--
+-- Name: object_property_oid; Type: INDEX; Schema: public; Owner: opengeo; Tablespace: 
+--
+
+CREATE INDEX object_property_oid ON object_property USING btree (oid);
+
+
+--
+-- Name: object_property_property_type; Type: INDEX; Schema: public; Owner: opengeo; Tablespace: 
+--
+
+CREATE INDEX object_property_property_type ON object_property USING btree (property_type);
+
+
+--
+-- Name: object_property_related_oid; Type: INDEX; Schema: public; Owner: opengeo; Tablespace: 
+--
+
+CREATE INDEX object_property_related_oid ON object_property USING btree (related_oid);
+
+
+--
+-- Name: object_property_related_property_type; Type: INDEX; Schema: public; Owner: opengeo; Tablespace: 
+--
+
+CREATE INDEX object_property_related_property_type ON object_property USING btree (related_property_type);
+
+
+--
+-- Name: object_property_value; Type: INDEX; Schema: public; Owner: opengeo; Tablespace: 
+--
+
+CREATE INDEX object_property_value ON object_property USING btree (value);
+
+
+--
+-- Name: object_property_value_upper; Type: INDEX; Schema: public; Owner: opengeo; Tablespace: 
+--
+
+CREATE INDEX object_property_value_upper ON object_property USING btree (upper((value)::text));
+
+
+--
+-- Name: object_type_id; Type: INDEX; Schema: public; Owner: opengeo; Tablespace: 
+--
+
+CREATE INDEX object_type_id ON object USING btree (type_id);
+
+
+--
+-- Name: property_type_collection; Type: INDEX; Schema: public; Owner: opengeo; Tablespace: 
+--
+
+CREATE INDEX property_type_collection ON property_type USING btree (collection);
+
+
+--
+-- Name: property_type_name; Type: INDEX; Schema: public; Owner: opengeo; Tablespace: 
+--
+
+CREATE INDEX property_type_name ON property_type USING btree (name);
+
+
+--
+-- Name: property_type_oid; Type: INDEX; Schema: public; Owner: opengeo; Tablespace: 
+--
+
+CREATE UNIQUE INDEX property_type_oid ON property_type USING btree (oid);
+
+
+--
+-- Name: property_type_target_property; Type: INDEX; Schema: public; Owner: opengeo; Tablespace: 
+--
+
+CREATE INDEX property_type_target_property ON property_type USING btree (target_property);
+
+
+--
+-- Name: property_type_type_id; Type: INDEX; Schema: public; Owner: opengeo; Tablespace: 
+--
+
+CREATE INDEX property_type_type_id ON property_type USING btree (type_id);
+
+
+--
+-- Name: type_oid; Type: INDEX; Schema: public; Owner: opengeo; Tablespace: 
+--
+
+CREATE UNIQUE INDEX type_oid ON type USING btree (oid);
+
+
+--
+-- Name: type_typename; Type: INDEX; Schema: public; Owner: opengeo; Tablespace: 
+--
+
+CREATE UNIQUE INDEX type_typename ON type USING btree (typename);
+
+
+--
+-- Name: fk_object_property; Type: FK CONSTRAINT; Schema: public; Owner: opengeo
+--
+
+ALTER TABLE ONLY object_property
+    ADD CONSTRAINT fk_object_property FOREIGN KEY (oid) REFERENCES object(oid) ON DELETE CASCADE;
+
+
+--
+-- Name: fk_object_property_property_type; Type: FK CONSTRAINT; Schema: public; Owner: opengeo
+--
+
+ALTER TABLE ONLY object_property
+    ADD CONSTRAINT fk_object_property_property_type FOREIGN KEY (property_type) REFERENCES property_type(oid);
+
+
+--
+-- Name: fk_object_type; Type: FK CONSTRAINT; Schema: public; Owner: opengeo
+--
+
+ALTER TABLE ONLY object
+    ADD CONSTRAINT fk_object_type FOREIGN KEY (type_id) REFERENCES type(oid);
+
+
+--
+-- Name: fk_property_type_target_property; Type: FK CONSTRAINT; Schema: public; Owner: opengeo
+--
+
+ALTER TABLE ONLY property_type
+    ADD CONSTRAINT fk_property_type_target_property FOREIGN KEY (target_property) REFERENCES property_type(oid);
+
+
+--
+-- Name: fk_type_property_type; Type: FK CONSTRAINT; Schema: public; Owner: opengeo
+--
+
+ALTER TABLE ONLY property_type
+    ADD CONSTRAINT fk_type_property_type FOREIGN KEY (type_id) REFERENCES type(oid);
+
+
+--
+-- Name: public; Type: ACL; Schema: -; Owner: postgres
+--
+
+REVOKE ALL ON SCHEMA public FROM PUBLIC;
+REVOKE ALL ON SCHEMA public FROM postgres;
+GRANT ALL ON SCHEMA public TO postgres;
+GRANT ALL ON SCHEMA public TO PUBLIC;
+
+
+--
+-- PostgreSQL database dump complete
+--
+
+</stringProp>
+          <stringProp name="queryArguments"></stringProp>
+          <stringProp name="queryArgumentsTypes"></stringProp>
+          <stringProp name="queryType">Callable Statement</stringProp>
+          <stringProp name="resultVariable"></stringProp>
+          <stringProp name="variableNames"></stringProp>
+        </JDBCSampler>
+        <hashTree>
+          <JDBCDataSource guiclass="TestBeanGUI" testclass="JDBCDataSource" testname="JDBC Connection Configuration" enabled="true">
+            <boolProp name="autocommit">true</boolProp>
+            <stringProp name="checkQuery">Select 1</stringProp>
+            <stringProp name="connectionAge">5000</stringProp>
+            <stringProp name="dataSource">Postgres</stringProp>
+            <stringProp name="dbUrl">jdbc:postgresql://${__P(dbserver,localhost)}:5432/gscatalog</stringProp>
+            <stringProp name="driver">org.postgresql.Driver</stringProp>
+            <boolProp name="keepAlive">false</boolProp>
+            <stringProp name="password">openge78902</stringProp>
+            <stringProp name="poolMax">10</stringProp>
+            <stringProp name="timeout">10000</stringProp>
+            <stringProp name="transactionIsolation">DEFAULT</stringProp>
+            <stringProp name="trimInterval">60000</stringProp>
+            <stringProp name="username">opengeo</stringProp>
+          </JDBCDataSource>
+          <hashTree/>
+        </hashTree>
+        <JDBCSampler guiclass="TestBeanGUI" testclass="JDBCSampler" testname="Set up store" enabled="true">
+          <stringProp name="TestPlan.comments">removes the existing test db and recreates with exactly the desired </stringProp>
+          <stringProp name="dataSource">Postgres</stringProp>
+          <stringProp name="query">DELETE FROM wfs_roads;</stringProp>
+          <stringProp name="queryArguments"></stringProp>
+          <stringProp name="queryArgumentsTypes"></stringProp>
+          <stringProp name="queryType">Callable Statement</stringProp>
+          <stringProp name="resultVariable"></stringProp>
+          <stringProp name="variableNames"></stringProp>
+        </JDBCSampler>
+        <hashTree>
+          <JDBCDataSource guiclass="TestBeanGUI" testclass="JDBCDataSource" testname="JDBC Connection Configuration" enabled="true">
+            <boolProp name="autocommit">true</boolProp>
+            <stringProp name="checkQuery">Select 1</stringProp>
+            <stringProp name="connectionAge">5000</stringProp>
+            <stringProp name="dataSource">Postgres</stringProp>
+            <stringProp name="dbUrl">jdbc:postgresql://${__P(dbserver,localhost)}:5432/wfs_t</stringProp>
+            <stringProp name="driver">org.postgresql.Driver</stringProp>
+            <boolProp name="keepAlive">false</boolProp>
+            <stringProp name="password">openge78902</stringProp>
+            <stringProp name="poolMax">10</stringProp>
+            <stringProp name="timeout">10000</stringProp>
+            <stringProp name="transactionIsolation">DEFAULT</stringProp>
+            <stringProp name="trimInterval">60000</stringProp>
+            <stringProp name="username">opengeo</stringProp>
+          </JDBCDataSource>
+          <hashTree/>
+        </hashTree>
+      </hashTree>
+    </hashTree>
+  </hashTree>
+</jmeterTestPlan>
