@@ -16,6 +16,7 @@ file=ARGV[0]
 
 def aggregate(name, timestamp, loadtime, bytes, latency, samples, errors)
   group=name.gsub(/[0-9]*[-].+$/, '').strip
+  return unless group =~ /^[0-9]/
 
   unless @results.has_key?(group)
     @results[group] = OpenStruct.new

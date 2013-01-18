@@ -92,7 +92,7 @@ end
 
 unless ARGV[0] && ARGV[1] && ARGV[2]
   puts "ERROR: missing parameter"
-  puts "usage: CONFIGURATION WORKSPACE TEST [NODES] [THREADS]"
+  puts "usage: CONFIGURATION WORKSPACE TEST [NODES] [THREADS] [BASE LOOPS]"
   exit 1 
 end
 
@@ -165,6 +165,12 @@ if ARGV[4]
 else
   min_threads=1
   max_threads=128
+end
+
+if ARGV[5]
+  base_loops = ARGV[5].to_i
+else
+  base_loops = BASE_LOOPS
 end
 
 outname = Time.now.strftime("%Y%m%d-%H%M%S-#{configs}-#{ARGV[1]}-#{ARGV[2]}")
@@ -284,7 +290,7 @@ node_cfg.each { |nodes|
   results="%02d_nodes.csv" % nodes
   until threads > max_threads
     # let the number of loops decrease slowly based on the number of threads
-    loops = (BASE_LOOPS / (threads ** (0.25))).to_i
+    loops = (base_loops / (threads ** (0.25))).to_i
     puts "Starting test: workspace=#{workspace} test=#{test} nodes=#{nodes} threads=#{threads} loops=#{loops} ..."
 
     nodes_s = "%02d" % nodes
