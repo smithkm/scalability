@@ -75,5 +75,59 @@ CONTROLFLOW.ows.wms.getmap: max number of parallel GetMap requests (default: 32)
 CONTROLFLOW.ows.gwc: max number of parallel tile requests (default: 32)
 Other CONTROLFLOW parameters can be set using the same pattern.
 
+WMS.enabled
+  * true
+  - false
+WMS.citeCompliant
+  - true
+  * false
+WMS.interpolation
+  * Nearest
+  - Bilinear
+  - Bicubic
+WMS.maxRequestMemory: limit or 0 to disable (default: 0)
+WMS.maxRenderingTime: limit or 0 to disable (default: 0)
+WMS.maxRenderingErrors: limit or 0 to disable (default: 0)
+
+
+WFS.enabled
+  * true
+  - false
+WFS.citeCompliant
+  - true
+  * false
+WFS.serviceLevel
+  - BASIC
+  - TRANSACTIONAL
+  * COMPLETE
+WFS.maxFeatures: (default: 1000000)
+WFS.featureBounding
+  - true 
+  * false 
+WFS.canonicalSchemaLocation
+  - true 
+  * false 
+WFS.encodeFeatureMember
+  - true 
+  * false 
+
+WCS.enabled
+  * true
+  - false
+WCS.citeCompliant
+  - true 
+  * false 
+WCS.verbose
+  - true 
+  * false
+WCS.gmlPrefixing
+  - true 
+  * false 
+WCS.maxInputMemory: (default 0)
+WCS.maxOutputMemory: (default 0)
+WCS.subsamplingEnabled
+  * true
+  - false
+
 =======
 TODO: Store configurations

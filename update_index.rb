@@ -46,7 +46,7 @@ def build_list_html(title, hash)
   
   hash.each do |key, val|
     html += "<li>#{key}<ul>"
-    val.each do |dir|
+    val.sort.each do |dir|
       parts = dir.split("-")
       html += "<li><input type=\"checkbox\" name=\"dir\[\]\" value=\"#{dir}\" /><a href=\"#{dir}\">#{parts[0]}-#{parts[1]}</a> #{pretty_parts(parts)}</li>"
     end

@@ -87,7 +87,7 @@ if ARGV.include?("-d")
   BASE_LOOPS=5
   ARGV.delete("-d")
 else
-  BASE_LOOPS=64
+  BASE_LOOPS=128
 end
 
 unless ARGV[0] && ARGV[1] && ARGV[2]
@@ -143,7 +143,7 @@ if ARGV[3]
       node_cfg.push(arg.to_i)
     end
   }
-  node_cfg.delete_if { |n| n < 0 }
+  node_cfg.delete_if { |n| n < 1 || n > 10 }
   node_cfg = node_cfg.uniq.sort
 else
   node_cfg = [ ]
@@ -249,7 +249,7 @@ unless check_server
   exit 1
 end
 
-puts "Configuring initial settings ..."
+puts "Configuring settings via REST..."
 geoserver_settings = JSON.parse(RestClient.get("#{REST_URL}/settings.json"))
 geoserver_global = geoserver_settings["global"]
 jai_settings = geoserver_global["jai"]
@@ -264,6 +264,40 @@ conf.each { |key, val|
   end
 }
 RestClient.put "#{REST_URL}/settings.json", geoserver_settings.to_json, :content_type => :json
+
+puts "Configuring WMS settings via REST..."
+geoserver_settings = JSON.parse(RestClient.get("#{REST_URL}/services/wms/settings.json"))
+geoserver_wms = geoserver_settings["wms"]
+conf.each { |key, val|
+  if key.start_with?("WMS.")
+    geoserver_wms[key.gsub(/^WMS./, '')] = val
+  end
+}
+RestClient.put "#{REST_URL}/services/wms/settings.json", geoserver_settings.to_json, :content_type => :json
+
+puts "Configuring WFS settings via REST..."
+geoserver_settings = JSON.parse(RestClient.get("#{REST_URL}/services/wfs/settings.json"))
+geoserver_wfs = geoserver_settings["wfs"]
+conf.each { |key, val|
+  if key.start_with?("WFS.")
+    geoserver_wfs[key.gsub(/^WFS./, '')] = val
+  end
+}
+RestClient.put "#{REST_URL}/services/wfs/settings.json", geoserver_settings.to_json, :content_type => :json
+
+puts "Configuring WCS settings via REST..."
+geoserver_settings = JSON.parse(RestClient.get("#{REST_URL}/services/wcs/settings.json"))
+geoserver_wcs = geoserver_settings["wcs"]
+conf.each { |key, val|
+  if key.start_with?("WCS.")
+    geoserver_wcs[key.gsub(/^WCS./, '')] = val
+  end
+}
+RestClient.put "#{REST_URL}/services/wcs/settings.json", geoserver_settings.to_json, :content_type => :json
+
+# ensure that changes take effect
+puts "Reload catalog changes"
+RestClient.put("#{REST_URL}/reload", '')
 
 Dir.chdir("workspaces/#{workspace}")
 gnuplot_cmd_base  = "set size 1,1;"
@@ -285,6 +319,7 @@ node_cfg.each { |nodes|
   unless nodes == 1
     start_nodes(conf["CONTAINER"], nodes) 
   end
+  sleep 10
   threads=min_threads
 
   results="%02d_nodes.csv" % nodes
