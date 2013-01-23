@@ -16,49 +16,42 @@
           <collectionProp name="Arguments.arguments">
             <elementProp name="service" elementType="HTTPArgument">
               <boolProp name="HTTPArgument.always_encode">true</boolProp>
-              <stringProp name="Argument.value">WMS</stringProp>
+              <stringProp name="Argument.value">WCS</stringProp>
               <stringProp name="Argument.metadata">=</stringProp>
               <boolProp name="HTTPArgument.use_equals">true</boolProp>
               <stringProp name="Argument.name">service</stringProp>
             </elementProp>
             <elementProp name="version" elementType="HTTPArgument">
               <boolProp name="HTTPArgument.always_encode">true</boolProp>
-              <stringProp name="Argument.value">1.1.1</stringProp>
+              <stringProp name="Argument.value">1.0.0</stringProp>
               <stringProp name="Argument.metadata">=</stringProp>
               <boolProp name="HTTPArgument.use_equals">true</boolProp>
               <stringProp name="Argument.name">version</stringProp>
             </elementProp>
             <elementProp name="request" elementType="HTTPArgument">
               <boolProp name="HTTPArgument.always_encode">true</boolProp>
-              <stringProp name="Argument.value">GetMap</stringProp>
+              <stringProp name="Argument.value">GetCoverage</stringProp>
               <stringProp name="Argument.metadata">=</stringProp>
               <boolProp name="HTTPArgument.use_equals">true</boolProp>
               <stringProp name="Argument.name">request</stringProp>
             </elementProp>
-            <elementProp name="layers" elementType="HTTPArgument">
+            <elementProp name="coverage" elementType="HTTPArgument">
               <boolProp name="HTTPArgument.always_encode">true</boolProp>
-              <stringProp name="Argument.value">${__P(layer, NE2_HR_LC_SR_W_DR_256)}</stringProp>
+              <stringProp name="Argument.value">raster:${__P(layer, NE2_HR_LC_SR_W_DR_256)}</stringProp>
               <stringProp name="Argument.metadata">=</stringProp>
               <boolProp name="HTTPArgument.use_equals">true</boolProp>
-              <stringProp name="Argument.name">layers</stringProp>
+              <stringProp name="Argument.name">coverage</stringProp>
             </elementProp>
-            <elementProp name="styles" elementType="HTTPArgument">
-              <boolProp name="HTTPArgument.always_encode">true</boolProp>
-              <stringProp name="Argument.value"></stringProp>
-              <stringProp name="Argument.metadata">=</stringProp>
-              <boolProp name="HTTPArgument.use_equals">true</boolProp>
-              <stringProp name="Argument.name">styles</stringProp>
-            </elementProp>
-            <elementProp name="srs" elementType="HTTPArgument">
+            <elementProp name="crs" elementType="HTTPArgument">
               <boolProp name="HTTPArgument.always_encode">true</boolProp>
               <stringProp name="Argument.value">EPSG:4326</stringProp>
               <stringProp name="Argument.metadata">=</stringProp>
               <boolProp name="HTTPArgument.use_equals">true</boolProp>
-              <stringProp name="Argument.name">srs</stringProp>
+              <stringProp name="Argument.name">crs</stringProp>
             </elementProp>
             <elementProp name="format" elementType="HTTPArgument">
               <boolProp name="HTTPArgument.always_encode">true</boolProp>
-              <stringProp name="Argument.value">image/jpeg</stringProp>
+              <stringProp name="Argument.value">jpeg</stringProp>
               <stringProp name="Argument.metadata">=</stringProp>
               <boolProp name="HTTPArgument.use_equals">true</boolProp>
               <stringProp name="Argument.name">format</stringProp>
@@ -77,20 +70,6 @@
               <boolProp name="HTTPArgument.use_equals">true</boolProp>
               <stringProp name="Argument.name">height</stringProp>
             </elementProp>
-            <elementProp name="tiled" elementType="HTTPArgument">
-              <boolProp name="HTTPArgument.always_encode">false</boolProp>
-              <stringProp name="Argument.value">true</stringProp>
-              <stringProp name="Argument.metadata">=</stringProp>
-              <boolProp name="HTTPArgument.use_equals">true</boolProp>
-              <stringProp name="Argument.name">tiled</stringProp>
-            </elementProp>
-            <elementProp name="tilesorigin" elementType="HTTPArgument">
-              <boolProp name="HTTPArgument.always_encode">false</boolProp>
-              <stringProp name="Argument.value">-180,-90</stringProp>
-              <stringProp name="Argument.metadata">=</stringProp>
-              <boolProp name="HTTPArgument.use_equals">true</boolProp>
-              <stringProp name="Argument.name">tilesorigin</stringProp>
-            </elementProp>
           </collectionProp>
         </elementProp>
         <stringProp name="HTTPSampler.domain">scale.dev.opengeo.org</stringProp>
@@ -99,7 +78,7 @@
         <stringProp name="HTTPSampler.response_timeout"></stringProp>
         <stringProp name="HTTPSampler.protocol"></stringProp>
         <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-        <stringProp name="HTTPSampler.path">geoserver/raster/wms</stringProp>
+        <stringProp name="HTTPSampler.path">geoserver/raster/wcs</stringProp>
         <stringProp name="HTTPSampler.concurrentPool">4</stringProp>
       </ConfigTestElement>
       <hashTree/>
