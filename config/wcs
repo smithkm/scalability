@@ -1,0 +1,3 @@
+WCS.enabled=true
+WMS.enabled=false
+WFS.enabled=false
