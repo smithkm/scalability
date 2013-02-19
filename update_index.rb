@@ -16,8 +16,11 @@ end
 def green(str)
   return to_colour(str, "green")
 end
+def gray(str)
+  return to_colour(str, "gray")
+end
 def pretty_parts(parts)
-  return red(parts[2]) + " " + blue(parts[3]) + " " + green(parts[4])
+  return red(parts[2]) + " " + blue(parts[3]) + " " + green(parts[4]) + " " + gray(parts[5])
 end
 
 def build_comparison_html(title, hash)
@@ -48,6 +51,10 @@ def build_list_html(title, hash)
     html += "<li>#{key}<ul>"
     val.sort.each do |dir|
       parts = dir.split("-")
+      if parts.size == 5
+        parts[5] = ""
+      end
+
       html += "<li><input type=\"checkbox\" name=\"dir\[\]\" value=\"#{dir}\" /><a href=\"#{dir}\">#{parts[0]}-#{parts[1]}</a> #{pretty_parts(parts)}</li>"
     end
     html += "</ul></li>\n"
@@ -117,7 +124,7 @@ wt_pairs = Hash.new
 Dir.glob("*").each do |dir|
   if File.directory?(dir)
     parts = dir.split("-")
-    if parts.size == 5
+    if parts.size == 5 || parts.size == 6
       puts "Adding #{dir} ..."
       plans.push(dir)
       configuration = parts[2]
