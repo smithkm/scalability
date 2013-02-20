@@ -11,7 +11,9 @@ require 'json'
 require 'pp'
 
 APP_SERVER="scale.dev.opengeo.org"
+APP_SERVER2="scale2.dev.opengeo.org"
 DB_SERVER="scale-db.dev.opengeo.org"
+DB_SERVER2="scale-db2.dev.opengeo.org"
 GEOSERVER_USER="admin"
 GEOSERVER_PASS="geoserver"
 GEOSERVER_URL="http://#{APP_SERVER}/geoserver"
@@ -88,6 +90,17 @@ if ARGV.include?("-d")
   ARGV.delete("-d")
 else
   BASE_LOOPS=128
+end
+
+# -m indicates a message tag
+index = ARGV.index("-m")
+if index.nil?
+  tag = nil
+else
+  tag = ARGV[index + 1]
+  ARGV.delete_at(index + 1)
+  ARGV.delete_at(index)
+  puts "Adding tag: #{tag} to test name"
 end
 
 unless ARGV[0] && ARGV[1] && ARGV[2]
@@ -174,6 +187,9 @@ else
 end
 
 outname = Time.now.strftime("%Y%m%d-%H%M%S-#{configs}-#{ARGV[1]}-#{ARGV[2]}")
+if not tag.nil?
+  outname = outname + "-#{tag}"
+end
 outdir = "#{pwd}/#{OUT_SUBDIR}/#{outname}"
 FileUtils.mkdir_p(outdir)
 

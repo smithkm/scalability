@@ -19,8 +19,11 @@ end
 def gray(str)
   return to_colour(str, "gray")
 end
+def orange(str)
+  return to_colour(str, "orange")
+end
 def pretty_parts(parts)
-  return red(parts[2]) + " " + blue(parts[3]) + " " + green(parts[4]) + " " + gray(parts[5])
+  return red(parts[2]) + " " + blue(parts[3]) + " " + green(parts[4]) + " " + orange(parts[6]) + " " + gray(parts[5])
 end
 
 def build_comparison_html(title, hash)
@@ -54,6 +57,19 @@ def build_list_html(title, hash)
       if parts.size == 5
         parts[5] = ""
       end
+
+      # find the number of nodes covered by this test
+      nodes = []
+      Dir.glob("#{dir}/*") do |f|
+        f[/(1?[0-9])_nodes.csv/]
+	nodes.push($1.to_i) if $1 != nil 
+      end
+      nodes = nodes.sort
+      coverage = ""
+      nodes.each do |node|
+        coverage += "#{node},"
+      end
+      parts[6] = coverage.chomp(',')
 
       html += "<li><input type=\"checkbox\" name=\"dir\[\]\" value=\"#{dir}\" /><a href=\"#{dir}\">#{parts[0]}-#{parts[1]}</a> #{pretty_parts(parts)}</li>"
     end
@@ -123,6 +139,7 @@ wt_pairs = Hash.new
 
 Dir.glob("*").each do |dir|
   if File.directory?(dir)
+
     parts = dir.split("-")
     if parts.size == 5 || parts.size == 6
       puts "Adding #{dir} ..."
