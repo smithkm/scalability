@@ -50,7 +50,7 @@ def build_list_html(title, hash)
   html  = "<h2>#{title}</h2>\n"
   html += "<ul>\n"
   
-  hash.each do |key, val|
+  hash.sort.map do |key, val|
     html += "<li>#{key}<ul>"
     val.sort.each do |dir|
       parts = dir.split("-")
