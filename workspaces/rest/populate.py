@@ -6,10 +6,8 @@ import re
 import os
 from geoserver.catalog import Catalog
 
-#appserver = 'http://scale.dev.opengeo.org:8080/geoserver'
-#dbserver = '10.32.180.122'
-appserver = 'http://localhost:8080/geoserver'
-dbserver = 'localhost'
+appserver = 'http://scale2.dev.opengeo.org:8080/geoserver'
+dbserver = 'scale-db2.dev.opengeo.org'
 
 ws_name = 'naturalearth'
 ds_name = 'ne_pg'
