@@ -124,6 +124,17 @@ html_footer = <<-EOD
     <option value="9">9</option>
     <option value="10">10</option>
   </select>
+  <select name="comp">
+    <option value="4">mean</option>
+    <option value="5">median</option>
+    <option value="6">90%</option>
+    <option value="7">min</option>
+    <option value="8">max</option>
+    <option value="9">duration</option>
+    <option value="10">throughput</option>
+    <option value="11">kb/s</option>
+    <option value="3">errors</option>
+  </select>
   <input type="submit" value="Compare...">
   </form>
 </body>

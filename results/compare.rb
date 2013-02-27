@@ -33,6 +33,18 @@ dirs.each do |dir|
 end
 
 nodes = @cgi.params['nodes']
+comp  = @cgi['comp']
+max   = @cgi['max']
+min   = @cgi['min']
+
+if min.empty?
+  min = "1"
+end
+
+if max.empty?
+  max = "128"
+end
+
 if nodes.empty? 
   output_error("incorrect arguments", "nodes must be between 1 and 10")
   exit 1
@@ -72,14 +84,37 @@ end
 gnuplot = <<-EOD
 set size 1,1;
 set terminal png size 760,640 nocrop enhanced;
-set xrange[1:128];
 set xlabel 'Concurrent users';
-set ylabel 'Response time (ms)';
 set datafile separator ',';
 set key reverse left Left width 1 box 3;
 set grid;
 EOD
 
+case comp
+when "3"
+  ylabel = "Errors"
+when "4"
+  ylabel = "Response time (ms)"
+when "5"
+  ylabel = "Median response time (ms)"
+when "6"
+  ylabel = "90% response time (ms)"
+when "7"
+  ylabel = "Min response time (ms)"
+when "8"
+  ylabel = "Max response time (ms)"
+when "9"
+  ylabel = "Total duration (ms)"
+when "10"
+  ylabel = "Throughput"
+when "11"
+  ylabel = "Data rate"
+else
+  ylabel = "#{comp}"
+end
+
+gnuplot += "set xrange[#{min}:#{max}];"
+gnuplot += "set ylabel \'#{ylabel}\';"
 gnuplot += "set title \'#{title.gsub('_', '\\_')}\';"
 gnuplot += "plot "
 
@@ -89,7 +124,7 @@ dirs.each do |dir|
   title_parts.each do |part|
     title += parts[part].gsub('_', '\\_') + "-"
   end
-  gnuplot += "'#{dir}/%02d_nodes.csv' using 1:4 with linespoints title '#{title.chomp('-')}' ," % nodes
+  gnuplot += "'#{dir}/%02d_nodes.csv' using 1:#{comp[0]} with linespoints title '#{title.chomp('-')}' ," % nodes
 end
 gnuplot = gnuplot.chomp(",") + ";"
 #@cgi.out{ gnuplot }
