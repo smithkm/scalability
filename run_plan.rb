@@ -10,14 +10,13 @@ require 'rest-client'
 require 'json'
 require 'pp'
 
-APP_SERVER="scale.dev.opengeo.org"
+APP_SERVER1="scale.dev.opengeo.org"
 APP_SERVER2="scale2.dev.opengeo.org"
+APP_SERVER_PROXY="scale.dev.opengeo.org"
 DB_SERVER="scale-db.dev.opengeo.org"
 DB_SERVER2="scale-db2.dev.opengeo.org"
 GEOSERVER_USER="admin"
 GEOSERVER_PASS="geoserver"
-GEOSERVER_URL="http://#{APP_SERVER}/geoserver"
-REST_URL="http://#{GEOSERVER_USER}:#{GEOSERVER_PASS}@#{APP_SERVER}/geoserver/rest"
 OUT_SUBDIR="results"
 BASE_CONF_FILE="base.conf"
 
@@ -91,6 +90,16 @@ if ARGV.include?("-d")
 else
   BASE_LOOPS=128
 end
+
+if ARGV.include?("-2")
+  APP_SERVER=APP_SERVER2
+  ARGV.delete("-2")
+else
+  APP_SERVER=APP_SERVER1
+end
+puts "using #{APP_SERVER}"
+GEOSERVER_URL="http://#{APP_SERVER_PROXY}/geoserver"
+REST_URL="http://#{GEOSERVER_USER}:#{GEOSERVER_PASS}@#{APP_SERVER_PROXY}/geoserver/rest"
 
 # -m indicates a message tag
 index = ARGV.index("-m")
