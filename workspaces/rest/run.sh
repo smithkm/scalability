@@ -7,7 +7,9 @@ THREADS=$3
 LOOPS=$4
 
 if [ "${TEST}" = "rest" ]; then
-  jmeter -p ../jmeter.properties -t wms_wfs.jmx -n -Jnodes=${NODES} -Jthreads=${THREADS} -Jloops=${LOOPS} -Jbboxes=tiles -Jserver=http://scale.dev.opengeo.org
+  ./populate.py
+  sleep 20
+  jmeter -p ../jmeter.properties -t wms_wfs.jmx -n -Jnodes=${NODES} -Jthreads=${THREADS} -Jloops=${LOOPS} 
 else
   echo "Unknown test"
   exit 1

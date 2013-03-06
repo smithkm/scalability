@@ -195,7 +195,7 @@ else
   base_loops = BASE_LOOPS
 end
 
-outname = Time.now.strftime("%Y%m%d-%H%M%S-#{configs}-#{ARGV[1]}-#{ARGV[2]}")
+outname = Time.now.strftime("%Y%m%d-%H%M%S-#{configs}-#{ARGV[1].gsub('-', '_')}-#{ARGV[2].gsub('-', '_')}")
 if not tag.nil?
   outname = outname + "-#{tag}"
 end
@@ -300,15 +300,15 @@ conf.each { |key, val|
 }
 RestClient.put "#{REST_URL}/services/wms/settings.json", geoserver_settings.to_json, :content_type => :json
 
-puts "Configuring WFS settings via REST..."
-geoserver_settings = JSON.parse(RestClient.get("#{REST_URL}/services/wfs/settings.json"))
-geoserver_wfs = geoserver_settings["wfs"]
-conf.each { |key, val|
-  if key.start_with?("WFS.")
-    geoserver_wfs[key.gsub(/^WFS./, '')] = val
-  end
-}
-RestClient.put "#{REST_URL}/services/wfs/settings.json", geoserver_settings.to_json, :content_type => :json
+#puts "Configuring WFS settings via REST..."
+#geoserver_settings = JSON.parse(RestClient.get("#{REST_URL}/services/wfs/settings.json"))
+#geoserver_wfs = geoserver_settings["wfs"]
+#conf.each { |key, val|
+#  if key.start_with?("WFS.")
+#    geoserver_wfs[key.gsub(/^WFS./, '')] = val
+#  end
+#}
+#RestClient.put "#{REST_URL}/services/wfs/settings.json", geoserver_settings.to_json, :content_type => :json
 
 puts "Configuring WCS settings via REST..."
 geoserver_settings = JSON.parse(RestClient.get("#{REST_URL}/services/wcs/settings.json"))
