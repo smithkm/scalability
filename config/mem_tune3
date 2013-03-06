@@ -1,0 +1,4 @@
+JAVA_MEM=-Xms1024m -Xmx8192m -XX:PermSize=256m -XX:MaxPermSize=512m -XX:NewSize=512m -XX:MaxNewSize=1024m -XX:SurvivorRatio=6 -XX:NewRatio=2 -XX:SoftRefLRUPolicyMSPerMB=3600
+JAVA_GC=-XX:+UseParallelGC -XX:+UseParallelOldGC
+#JAVA_EXTRA=-XX:+AggressiveOpts
+JAVA_EXTRA=-XX:+AggressiveOpts -XX:+AggressiveHeap -XX:ParallelGCThreads=2 
