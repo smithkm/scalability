@@ -8,7 +8,9 @@ LOOPS=$4
 
 if [ "${TEST}" = "rest" ]; then
   ./populate.py
-  sleep 20
+  sleep 5
+  jmeter -p ../jmeter.properties -t wms_wfs.jmx -n -Jnodes=${NODES} -Jthreads=${THREADS} -Jloops=${LOOPS} 
+elif [ "${TEST}" = "test" ]; then
   jmeter -p ../jmeter.properties -t wms_wfs.jmx -n -Jnodes=${NODES} -Jthreads=${THREADS} -Jloops=${LOOPS} 
 else
   echo "Unknown test"

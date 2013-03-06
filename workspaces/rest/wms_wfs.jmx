@@ -38,9 +38,9 @@
         <stringProp name="HTTPSampler.concurrentPool">4</stringProp>
       </ConfigTestElement>
       <hashTree/>
-      <SetupThreadGroup guiclass="SetupThreadGroupGui" testclass="SetupThreadGroup" testname="Import data" enabled="false">
+      <SetupThreadGroup guiclass="SetupThreadGroupGui" testclass="SetupThreadGroup" testname="Import data" enabled="true">
         <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
-        <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
+        <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="false">
           <boolProp name="LoopController.continue_forever">false</boolProp>
           <stringProp name="LoopController.loops">1</stringProp>
         </elementProp>
@@ -66,7 +66,7 @@ IsSuccess = p.exitValue() == 0;</stringProp>
         </BeanShellSampler>
         <hashTree/>
       </hashTree>
-      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Request Features" enabled="true">
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="${__P(threads)}" enabled="true">
         <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
         <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
           <boolProp name="LoopController.continue_forever">false</boolProp>
@@ -146,10 +146,10 @@ IsSuccess = p.exitValue() == 0;</stringProp>
             <stringProp name="HTTPSampler.path">/geoserver/wfs</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
             <boolProp name="HTTPSampler.follow_redirects">false</boolProp>
-            <boolProp name="HTTPSampler.auto_redirects">true</boolProp>
-            <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+            <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+            <boolProp name="HTTPSampler.use_keepalive">false</boolProp>
             <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
-            <stringProp name="HTTPSampler.implementation">Java</stringProp>
+            <stringProp name="HTTPSampler.implementation">HttpClient4</stringProp>
             <boolProp name="HTTPSampler.monitor">false</boolProp>
             <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
           </HTTPSamplerProxy>
@@ -177,7 +177,7 @@ IsSuccess = p.exitValue() == 0;</stringProp>
           <hashTree/>
         </hashTree>
       </hashTree>
-      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Request Features" enabled="true">
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="${__P(threads)}" enabled="true">
         <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
         <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
           <boolProp name="LoopController.continue_forever">false</boolProp>
@@ -223,10 +223,10 @@ IsSuccess = p.exitValue() == 0;</stringProp>
             <stringProp name="HTTPSampler.path">/geoserver/wfs</stringProp>
             <stringProp name="HTTPSampler.method">POST</stringProp>
             <boolProp name="HTTPSampler.follow_redirects">false</boolProp>
-            <boolProp name="HTTPSampler.auto_redirects">true</boolProp>
-            <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+            <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+            <boolProp name="HTTPSampler.use_keepalive">false</boolProp>
             <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
-            <stringProp name="HTTPSampler.implementation">Java</stringProp>
+            <stringProp name="HTTPSampler.implementation">HttpClient4</stringProp>
             <boolProp name="HTTPSampler.monitor">false</boolProp>
             <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
           </HTTPSamplerProxy>
@@ -254,7 +254,7 @@ IsSuccess = p.exitValue() == 0;</stringProp>
           <hashTree/>
         </hashTree>
       </hashTree>
-      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Request Maps" enabled="true">
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="${__P(threads)}" enabled="true">
         <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
         <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
           <boolProp name="LoopController.continue_forever">false</boolProp>
@@ -348,10 +348,10 @@ IsSuccess = p.exitValue() == 0;</stringProp>
             <stringProp name="HTTPSampler.path">/geoserver/wms</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
             <boolProp name="HTTPSampler.follow_redirects">false</boolProp>
-            <boolProp name="HTTPSampler.auto_redirects">true</boolProp>
-            <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+            <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+            <boolProp name="HTTPSampler.use_keepalive">false</boolProp>
             <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
-            <stringProp name="HTTPSampler.implementation">Java</stringProp>
+            <stringProp name="HTTPSampler.implementation">HttpClient4</stringProp>
             <boolProp name="HTTPSampler.monitor">false</boolProp>
             <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
           </HTTPSamplerProxy>
@@ -411,7 +411,7 @@ IsSuccess = p.exitValue() == 0;</stringProp>
         <stringProp name="filename"></stringProp>
       </ResultCollector>
       <hashTree/>
-      <ResultCollector guiclass="StatVisualizer" testclass="ResultCollector" testname="Aggregate Report" enabled="true">
+      <ResultCollector guiclass="SummaryReport" testclass="ResultCollector" testname="Summary Report" enabled="true">
         <boolProp name="ResultCollector.error_logging">false</boolProp>
         <objProp>
           <name>saveConfig</name>
@@ -419,14 +419,14 @@ IsSuccess = p.exitValue() == 0;</stringProp>
             <time>true</time>
             <latency>true</latency>
             <timestamp>true</timestamp>
-            <success>true</success>
-            <label>true</label>
-            <code>true</code>
+            <success>false</success>
+            <label>false</label>
+            <code>false</code>
             <message>false</message>
             <threadName>true</threadName>
-            <dataType>true</dataType>
+            <dataType>false</dataType>
             <encoding>false</encoding>
-            <assertions>true</assertions>
+            <assertions>false</assertions>
             <subresults>false</subresults>
             <responseData>false</responseData>
             <samplerData>false</samplerData>
@@ -438,9 +438,11 @@ IsSuccess = p.exitValue() == 0;</stringProp>
             <saveAssertionResultsFailureMessage>false</saveAssertionResultsFailureMessage>
             <assertionsResultsToSave>0</assertionsResultsToSave>
             <bytes>true</bytes>
+            <sampleCount>true</sampleCount>
           </value>
         </objProp>
-        <stringProp name="filename">summary_${__time(yyyyMMdd-HHmmss)}.csv</stringProp>
+        <stringProp name="filename">${__property(user.dir)}${__BeanShell(File.separator,)}summary_${__P(nodes,01)}_${__P(threads)}.csv</stringProp>
+        <boolProp name="useGroupName">true</boolProp>
       </ResultCollector>
       <hashTree/>
     </hashTree>
