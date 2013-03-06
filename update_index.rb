@@ -124,6 +124,26 @@ html_footer = <<-EOD
     <option value="9">9</option>
     <option value="10">10</option>
   </select>
+  <select name="min">
+    <option value="">min threads range</option>
+    <option value="1">1</option>
+    <option value="2">2</option>
+    <option value="4">4</option>
+    <option value="8">8</option>
+    <option value="16">16</option>
+    <option value="32">32</option>
+    <option value="64">64</option>
+  </select>
+  <select name="max">
+    <option value="">max threads range</option>
+    <option value="2">2</option>
+    <option value="4">4</option>
+    <option value="8">8</option>
+    <option value="16">16</option>
+    <option value="32">32</option>
+    <option value="64">64</option>
+    <option value="128">128</option>
+  </select>
   <select name="comp">
     <option value="4">mean</option>
     <option value="5">median</option>
@@ -205,7 +225,7 @@ File.open(INDEX, 'w') do |file|
   file.write(tests_html)
   file.write(configurations_html)
   file.write("<hr/>")
-  file.write(wt_pairs_html)
-  file.write(wc_pairs_html)
+#  file.write(wt_pairs_html)
+#  file.write(wc_pairs_html)
   file.write(html_footer)
 end
