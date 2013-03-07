@@ -10,11 +10,6 @@ require 'rest-client'
 require 'json'
 require 'pp'
 
-APP_SERVER1="scale.dev.opengeo.org"
-APP_SERVER2="scale2.dev.opengeo.org"
-APP_SERVER_PROXY="scale.dev.opengeo.org"
-DB_SERVER="scale-db.dev.opengeo.org"
-DB_SERVER2="scale-db2.dev.opengeo.org"
 GEOSERVER_USER="admin"
 GEOSERVER_PASS="geoserver"
 OUT_SUBDIR="results"
@@ -81,6 +76,11 @@ def read_config(conf_file, conf)
   end
 end
 
+commandline = ""
+ARGV.each do |arg|
+  commandline += arg + " "
+end
+
 # -d indicated debugging, turn off certain elements
 if ARGV.include?("-d")
   puts "DEBUG MODE"
@@ -91,15 +91,14 @@ else
   BASE_LOOPS=128
 end
 
-if ARGV.include?("-2")
-  APP_SERVER=APP_SERVER2
-  ARGV.delete("-2")
+# -noconf to disable all configuration of servers using ssh
+if ARGV.include?("-nossh")
+  ARGV.delete("-nossh")
+  SSH=false
+  puts "NO AUTOMATIC SERVER CONFIGURATION / NODE STARTING POSSIBLE"
 else
-  APP_SERVER=APP_SERVER1
+  SSH=true
 end
-puts "using #{APP_SERVER}"
-GEOSERVER_URL="http://#{APP_SERVER_PROXY}/geoserver"
-REST_URL="http://#{GEOSERVER_USER}:#{GEOSERVER_PASS}@#{APP_SERVER_PROXY}/geoserver/rest"
 
 # -m indicates a message tag
 index = ARGV.index("-m")
@@ -112,9 +111,43 @@ else
   puts "Adding tag: #{tag} to test name"
 end
 
+# -s server
+index = ARGV.index("-s")
+if index.nil?
+  APP_SERVER_HOST ="scale.dev.opengeo.org"
+else
+  APP_SERVER_HOST = ARGV[index + 1]
+  ARGV.delete_at(index + 1)
+  ARGV.delete_at(index)
+end
+
+# -p port
+index = ARGV.index("-p")
+if index.nil?
+  APP_SERVER_PORT="80"
+else
+  APP_SERVER_PORT = ARGV[index + 1]
+  ARGV.delete_at(index + 1)
+  ARGV.delete_at(index)
+end
+
+# -c configuration server that will be accessed by ssh
+index = ARGV.index("-c")
+if index.nil?
+  SSH_SERVER=APP_SERVER_HOST
+else
+  SSH_SERVER= ARGV[index + 1]
+  ARGV.delete_at(index + 1)
+  ARGV.delete_at(index)
+end
+
+GEOSERVER_URL="http://#{APP_SERVER_HOST}:#{APP_SERVER_PORT}/geoserver"
+REST_URL="http://#{GEOSERVER_USER}:#{GEOSERVER_PASS}@#{APP_SERVER_HOST}:#{APP_SERVER_PORT}/geoserver/rest"
+
 unless ARGV[0] && ARGV[1] && ARGV[2]
   puts "ERROR: missing parameter"
   puts "usage: CONFIGURATION WORKSPACE TEST [NODES] [THREADS] [BASE LOOPS]"
+  puts "       [-d] [-nossh] [-m MESSAGE] [-s SERVER] [-p PORT] [-c CONFIG_SERVER]"
   exit 1 
 end
 
@@ -134,9 +167,6 @@ configs.split(",").each do | config |
   end
 end
 configs = configs.gsub(/,/, '.')
-conf.each do |k,v|
-  puts k + "=" + v
-end
 
 # check test case directory
 workspace = ARGV[1]
@@ -210,6 +240,7 @@ conf.each { |key, val|
 conf_list = conf_list.sort
 
 File.open("#{outdir}/plan.txt", 'w') { |file|
+  file.write("command=#{commandline}\n")
   file.write("workspace=#{workspace}\n")
   file.write("test=#{test}\n")
   conf_list.each { |line|
@@ -217,61 +248,63 @@ File.open("#{outdir}/plan.txt", 'w') { |file|
   }
 }
 
-# set up a tomcat container
-if conf["CONTAINER"] == "tomcat"
-  Net::SSH.start(APP_SERVER, "tomcat", :port => 7777 ) do |ssh|
-    unless @debug
-      puts "Shutting down running nodes ..."
-      ssh.exec("pkill java")
-      ssh.exec!("pkill -9 java") if check_server(20)
-      if check_server(5)
-	puts "Server still running ... aborting"
-        exit 1
+if SSH
+  # set up a tomcat container
+  if conf["CONTAINER"] == "tomcat"
+    Net::SSH.start(SSH_SERVER, "tomcat", :port => 7777 ) do |ssh|
+      unless @debug
+        puts "Shutting down running nodes ..."
+        ssh.exec("pkill java")
+        ssh.exec!("pkill -9 java") if check_server(20)
+        if check_server(5)
+  	puts "Server still running ... aborting"
+          exit 1
+        end
       end
+  
+      puts "Setting JAVA options ..."
+      ssh.exec!("sed -i \"s/^JAVA_HOME=.*/JAVA_HOME=\\\"\\/usr\\/lib\\/jvm\\/#{conf["JVM"]}\\\"/\" #{TOMCAT_SH}")
+      ssh.exec!("sed -i \"s/^JAVA_MEM=.*/JAVA_MEM=\\\"#{conf["JAVA_MEM"]}\\\"/\" #{TOMCAT_CONF}")
+      ssh.exec!("sed -i \"s/^JAVA_GC=.*/JAVA_GC=\\\"#{conf["JAVA_GC"]}\\\"/\" #{TOMCAT_CONF}")
+      ssh.exec!("sed -i \"s/^JAVA_EXTRA=.*/JAVA_EXTRA=\\\"#{conf["JAVA_EXTRA"]}\\\"/\" #{TOMCAT_CONF}")
+      ssh.exec!("sed -i \"s/^GEOSERVER_DIR=.*/GEOSERVER_DIR=\\\"\\/var\\/lib\\/geoserver_data\\/#{workspace}\\\"/\" #{TOMCAT_CONF}")
     end
-
-    puts "Setting JAVA options ..."
-    ssh.exec!("sed -i \"s/^JAVA_HOME=.*/JAVA_HOME=\\\"\\/usr\\/lib\\/jvm\\/#{conf["JVM"]}\\\"/\" #{TOMCAT_SH}")
-    ssh.exec!("sed -i \"s/^JAVA_MEM=.*/JAVA_MEM=\\\"#{conf["JAVA_MEM"]}\\\"/\" #{TOMCAT_CONF}")
-    ssh.exec!("sed -i \"s/^JAVA_GC=.*/JAVA_GC=\\\"#{conf["JAVA_GC"]}\\\"/\" #{TOMCAT_CONF}")
-    ssh.exec!("sed -i \"s/^JAVA_EXTRA=.*/JAVA_EXTRA=\\\"#{conf["JAVA_EXTRA"]}\\\"/\" #{TOMCAT_CONF}")
-    ssh.exec!("sed -i \"s/^GEOSERVER_DIR=.*/GEOSERVER_DIR=\\\"\\/var\\/lib\\/geoserver_data\\/#{workspace}\\\"/\" #{TOMCAT_CONF}")
+  else
+    puts "Unsupported container #{conf["CONTAINER"]} ... aborint"
+    exit 1
   end
-else
-  puts "Unsupported container #{conf["CONTAINER"]} ... aborint"
-  exit 1
-end
-
-# generic config for all containers (container name must be same as user)
-Net::SSH.start(APP_SERVER, conf["CONTAINER"], :port => 7777 ) do |ssh|
-  # some configurations need to occur before any nodes are brought up
-  # set up control flow
-  controlflow_conf="#{DATA_DIR}/#{workspace}/controlflow.properties"
-  ssh.exec!("rm #{controlflow_conf}")
-  if conf["CONTROLFLOW"] == "true"
-    puts "Turning on ControlFlow ..."
-    conf.each { |key, val|
-      if key.start_with?("CONTROLFLOW.")
-        ssh.exec!("echo \"#{key.gsub(/^CONTROLFLOW./, '')}=#{val}\" >> #{controlflow_conf}")
-      end
-    }
+  
+  # generic config for all containers (container name must be same as user)
+  Net::SSH.start(SSH_SERVER, conf["CONTAINER"], :port => 7777 ) do |ssh|
+    # some configurations need to occur before any nodes are brought up
+    # set up control flow
+    controlflow_conf="#{DATA_DIR}/#{workspace}/controlflow.properties"
+    ssh.exec!("rm #{controlflow_conf}")
+    if conf["CONTROLFLOW"] == "true"
+      puts "Turning on ControlFlow ..."
+      conf.each { |key, val|
+        if key.start_with?("CONTROLFLOW.")
+          ssh.exec!("echo \"#{key.gsub(/^CONTROLFLOW./, '')}=#{val}\" >> #{controlflow_conf}")
+        end
+      }
+    end
+  
+    # set logging
+    puts "Set logging level ..."
+    log_conf="#{DATA_DIR}/#{workspace}/logging.xml"
+    level = conf["LOGGING.level"] + ".properties"
+    ssh.exec!("sed -i \"s/<level>.*<\\\/level>/<level>#{level}<\\\/level>/\" #{log_conf}")
   end
-
-  # set logging
-  puts "Set logging level ..."
-  log_conf="#{DATA_DIR}/#{workspace}/logging.xml"
-  level = conf["LOGGING.level"] + ".properties"
-  ssh.exec!("sed -i \"s/<level>.*<\\\/level>/<level>#{level}<\\\/level>/\" #{log_conf}")
-end
-
-
-# start up the first node so we can initialise via the rest api
-# configure global settings
-puts "Starting first node ..."
-start_nodes(conf["CONTAINER"], 1)
-unless check_server
-  puts "Server is not responding ... aborting tests"
-  exit 1
+  
+  
+  # start up the first node so we can initialise via the rest api
+  # configure global settings
+  puts "Starting first node ..."
+  start_nodes(conf["CONTAINER"], 1)
+  unless check_server
+    puts "Server is not responding ... aborting tests"
+    exit 1
+  end
 end
 
 puts "Configuring settings via REST..."
@@ -342,7 +375,7 @@ Dir.glob("#{workspace_dir}/summary_*.csv").each { |file|
 results_table = ""
 node_cfg.each { |nodes|
   unless nodes == 1
-    start_nodes(conf["CONTAINER"], nodes) 
+    start_nodes(conf["CONTAINER"], nodes) if SSH
   end
   sleep 10
   threads=min_threads
@@ -356,7 +389,7 @@ node_cfg.each { |nodes|
     nodes_s = "%02d" % nodes
     threads_s = "%03d" % threads
     loops_s = "%04d" % loops
-    unless system("./run.sh #{test} #{nodes_s} #{threads_s} #{loops_s}")
+    unless system("./run.sh #{test} #{nodes_s} #{threads_s} #{loops_s} #{APP_SERVER_HOST} #{APP_SERVER_PORT}")
       puts "Error running test... aborting"
       exit 1
     end
