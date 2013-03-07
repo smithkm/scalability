@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jmeterTestPlan version="1.2" properties="2.3" jmeter="2.8 r1393162">
+  <hashTree>
+    <TestPlan guiclass="TestPlanGui" testclass="TestPlan" testname="WFS Test" enabled="true">
+      <stringProp name="TestPlan.comments"></stringProp>
+      <boolProp name="TestPlan.functional_mode">false</boolProp>
+      <boolProp name="TestPlan.serialize_threadgroups">false</boolProp>
+      <elementProp name="TestPlan.user_defined_variables" elementType="Arguments" guiclass="ArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
+        <collectionProp name="Arguments.arguments"/>
+      </elementProp>
+      <stringProp name="TestPlan.user_define_classpath"></stringProp>
+    </TestPlan>
+    <hashTree>
+      <AuthManager guiclass="AuthPanel" testclass="AuthManager" testname="HTTP Authorization Manager" enabled="true">
+        <collectionProp name="AuthManager.auth_list"/>
+      </AuthManager>
+      <hashTree/>
+      <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="HTTP Header Manager" enabled="true">
+        <collectionProp name="HeaderManager.headers">
+          <elementProp name="" elementType="Header">
+            <stringProp name="Header.name">content-type</stringProp>
+            <stringProp name="Header.value">text/xml</stringProp>
+          </elementProp>
+        </collectionProp>
+      </HeaderManager>
+      <hashTree/>
+      <ConfigTestElement guiclass="HttpDefaultsGui" testclass="ConfigTestElement" testname="HTTP Request Defaults" enabled="true">
+        <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
+          <collectionProp name="Arguments.arguments"/>
+        </elementProp>
+        <stringProp name="HTTPSampler.domain">${__P(server,localhost)}</stringProp>
+        <stringProp name="HTTPSampler.port">${__P(port,8080)}</stringProp>
+        <stringProp name="HTTPSampler.connect_timeout"></stringProp>
+        <stringProp name="HTTPSampler.response_timeout"></stringProp>
+        <stringProp name="HTTPSampler.protocol"></stringProp>
+        <stringProp name="HTTPSampler.contentEncoding">utf-8</stringProp>
+        <stringProp name="HTTPSampler.path">/geoserver/wfs</stringProp>
+        <stringProp name="HTTPSampler.concurrentPool">4</stringProp>
+      </ConfigTestElement>
+      <hashTree/>
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="${__P(threads)}" enabled="true">
+        <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
+        <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
+          <boolProp name="LoopController.continue_forever">false</boolProp>
+          <stringProp name="LoopController.loops">${__P(loops,1)}</stringProp>
+        </elementProp>
+        <stringProp name="ThreadGroup.num_threads">${__P(threads,1)}</stringProp>
+        <stringProp name="ThreadGroup.ramp_time">0</stringProp>
+        <longProp name="ThreadGroup.start_time">1357865766000</longProp>
+        <longProp name="ThreadGroup.end_time">1357865766000</longProp>
+        <boolProp name="ThreadGroup.scheduler">false</boolProp>
+        <stringProp name="ThreadGroup.duration"></stringProp>
+        <stringProp name="ThreadGroup.delay"></stringProp>
+      </ThreadGroup>
+      <hashTree>
+        <GenericController guiclass="LogicControllerGui" testclass="GenericController" testname="WFS Insert" enabled="true"/>
+        <hashTree>
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Insert Feature" enabled="true">
+            <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
+            <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
+              <collectionProp name="Arguments.arguments">
+                <elementProp name="" elementType="HTTPArgument">
+                  <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                  <stringProp name="Argument.value">&lt;wfs:Transaction service=&quot;WFS&quot; version=&quot;1.0.0&quot;&#xd;
+  xmlns:wfs=&quot;http://www.opengis.net/wfs&quot;&#xd;
+  xmlns:naturalearth=&quot;http://www.naturalearth.org&quot;&#xd;
+  xmlns:gml=&quot;http://www.opengis.net/gml&quot;&#xd;
+  xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;&#xd;
+  xsi:schemaLocation=&quot;http://www.opengis.net/wfs http://schemas.opengis.net/wfs/1.0.0/WFS-transaction.xsd http://www.naturalearth.org/ http://${__P(server,localhost)}:${__P(port,8080)}/geoserver/wfs/DescribeFeatureType?typename=naturalearth:wfs_roads&quot; &gt;&#xd;
+  &lt;wfs:Insert&gt;&#xd;
+    &lt;naturalearth:wfs_roads&gt;&#xd;
+        &lt;naturalearth:the_geom&gt;&#xd;
+        &lt;gml:MultiLineString srsName=&quot;http://www.opengis.net/gml/srs/epsg.xml#4326&quot;&gt;&#xd;
+          &lt;gml:lineStringMember&gt;&#xd;
+            &lt;gml:LineString&gt;&#xd;
+              &lt;gml:coordinates&gt;${the_geom}&lt;/gml:coordinates&gt;&#xd;
+            &lt;/gml:LineString&gt;&#xd;
+          &lt;/gml:lineStringMember&gt;&#xd;
+        &lt;/gml:MultiLineString&gt;&#xd;
+      &lt;/naturalearth:the_geom&gt;&#xd;
+      &lt;naturalearth:FID&gt;${FID}&lt;/naturalearth:FID&gt;&#xd;
+      &lt;naturalearth:scalerank&gt;${scalerank}&lt;/naturalearth:scalerank&gt;&#xd;
+      &lt;naturalearth:featurecla&gt;${featurecla}&lt;/naturalearth:featurecla&gt;&#xd;
+      &lt;naturalearth:type&gt;${type}&lt;/naturalearth:type&gt;&#xd;
+      &lt;naturalearth:sov_a3&gt;${sov_a3}&lt;/naturalearth:sov_a3&gt;&#xd;
+      &lt;naturalearth:note&gt;${note}&lt;/naturalearth:note&gt;&#xd;
+      &lt;naturalearth:edited&gt;${edited}&lt;/naturalearth:edited&gt;&#xd;
+      &lt;naturalearth:name&gt;${name}&lt;/naturalearth:name&gt;&#xd;
+      &lt;naturalearth:namealt&gt;${namealt}&lt;/naturalearth:namealt&gt;&#xd;
+      &lt;naturalearth:namealtt&gt;${namealtt}&lt;/naturalearth:namealtt&gt;&#xd;
+      &lt;naturalearth:routeraw&gt;${routeraw}&lt;/naturalearth:routeraw&gt;&#xd;
+      &lt;naturalearth:question&gt;${question}&lt;/naturalearth:question&gt;&#xd;
+      &lt;naturalearth:length_km&gt;${length_km}&lt;/naturalearth:length_km&gt;&#xd;
+      &lt;naturalearth:toll&gt;${toll}&lt;/naturalearth:toll&gt;&#xd;
+      &lt;naturalearth:ne_part&gt;${ne_part}&lt;/naturalearth:ne_part&gt;&#xd;
+      &lt;naturalearth:label&gt;${label}&lt;/naturalearth:label&gt;&#xd;
+      &lt;naturalearth:label2&gt;${label2}&lt;/naturalearth:label2&gt;&#xd;
+      &lt;naturalearth:local&gt;${local}&lt;/naturalearth:local&gt;&#xd;
+      &lt;naturalearth:localtype&gt;${localtype}&lt;/naturalearth:localtype&gt;&#xd;
+      &lt;naturalearth:localalt&gt;${localalt}&lt;/naturalearth:localalt&gt;&#xd;
+      &lt;naturalearth:labelrank&gt;${labelrank}&lt;/naturalearth:labelrank&gt;&#xd;
+      &lt;naturalearth:ignore&gt;${ignore}&lt;/naturalearth:ignore&gt;&#xd;
+      &lt;naturalearth:add&gt;${add}&lt;/naturalearth:add&gt;&#xd;
+      &lt;naturalearth:rwdb_rd_id&gt;${rwdb_rd_id}&lt;/naturalearth:rwdb_rd_id&gt;&#xd;
+      &lt;naturalearth:orig_fid&gt;${orig_fid}&lt;/naturalearth:orig_fid&gt;&#xd;
+      &lt;naturalearth:prefix&gt;${prefix}&lt;/naturalearth:prefix&gt;&#xd;
+      &lt;naturalearth:uident&gt;${uident}&lt;/naturalearth:uident&gt;&#xd;
+      &lt;naturalearth:continent&gt;${continent}&lt;/naturalearth:continent&gt;&#xd;
+      &lt;naturalearth:expressway&gt;${expressway}&lt;/naturalearth:expressway&gt;&#xd;
+      &lt;naturalearth:level&gt;${level}&lt;/naturalearth:level&gt;&#xd;
+    &lt;/naturalearth:wfs_roads&gt;&#xd;
+  &lt;/wfs:Insert&gt;&#xd;
+&lt;/wfs:Transaction&gt;</stringProp>
+                  <stringProp name="Argument.metadata">=</stringProp>
+                </elementProp>
+              </collectionProp>
+            </elementProp>
+            <stringProp name="HTTPSampler.domain"></stringProp>
+            <stringProp name="HTTPSampler.port"></stringProp>
+            <stringProp name="HTTPSampler.connect_timeout"></stringProp>
+            <stringProp name="HTTPSampler.response_timeout"></stringProp>
+            <stringProp name="HTTPSampler.protocol"></stringProp>
+            <stringProp name="HTTPSampler.contentEncoding"></stringProp>
+            <stringProp name="HTTPSampler.path"></stringProp>
+            <stringProp name="HTTPSampler.method">POST</stringProp>
+            <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+            <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+            <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+            <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+            <boolProp name="HTTPSampler.monitor">false</boolProp>
+            <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
+          </HTTPSamplerProxy>
+          <hashTree/>
+          <CSVDataSet guiclass="TestBeanGUI" testclass="CSVDataSet" testname="CSV Data Set Config" enabled="true">
+            <stringProp name="delimiter">#</stringProp>
+            <stringProp name="fileEncoding"></stringProp>
+            <stringProp name="filename">roads.csv</stringProp>
+            <boolProp name="quotedData">false</boolProp>
+            <boolProp name="recycle">false</boolProp>
+            <stringProp name="shareMode">All threads</stringProp>
+            <boolProp name="stopThread">true</boolProp>
+            <stringProp name="variableNames">FID,the_geom,scalerank,featurecla,type,sov_a3,note,edited,name,namealt,namealtt,routeraw,question,length_km,toll,ne_part,label,label2,local,localtype,localalt,labelrank,ignore,add,rwdb_rd_id,orig_fid,prefix,uident,continent,expressway,level</stringProp>
+          </CSVDataSet>
+          <hashTree/>
+        </hashTree>
+      </hashTree>
+      <ResultCollector guiclass="ViewResultsFullVisualizer" testclass="ResultCollector" testname="View Results Tree" enabled="false">
+        <boolProp name="ResultCollector.error_logging">false</boolProp>
+        <objProp>
+          <name>saveConfig</name>
+          <value class="SampleSaveConfiguration">
+            <time>true</time>
+            <latency>true</latency>
+            <timestamp>true</timestamp>
+            <success>true</success>
+            <label>true</label>
+            <code>true</code>
+            <message>true</message>
+            <threadName>true</threadName>
+            <dataType>true</dataType>
+            <encoding>false</encoding>
+            <assertions>true</assertions>
+            <subresults>true</subresults>
+            <responseData>false</responseData>
+            <samplerData>false</samplerData>
+            <xml>true</xml>
+            <fieldNames>false</fieldNames>
+            <responseHeaders>false</responseHeaders>
+            <requestHeaders>false</requestHeaders>
+            <responseDataOnError>false</responseDataOnError>
+            <saveAssertionResultsFailureMessage>false</saveAssertionResultsFailureMessage>
+            <assertionsResultsToSave>0</assertionsResultsToSave>
+            <bytes>true</bytes>
+          </value>
+        </objProp>
+        <stringProp name="filename"></stringProp>
+      </ResultCollector>
+      <hashTree/>
+      <ResultCollector guiclass="SummaryReport" testclass="ResultCollector" testname="Summary Report" enabled="true">
+        <boolProp name="ResultCollector.error_logging">false</boolProp>
+        <objProp>
+          <name>saveConfig</name>
+          <value class="SampleSaveConfiguration">
+            <time>true</time>
+            <latency>true</latency>
+            <timestamp>true</timestamp>
+            <success>false</success>
+            <label>false</label>
+            <code>false</code>
+            <message>false</message>
+            <threadName>true</threadName>
+            <dataType>false</dataType>
+            <encoding>false</encoding>
+            <assertions>false</assertions>
+            <subresults>false</subresults>
+            <responseData>false</responseData>
+            <samplerData>false</samplerData>
+            <xml>false</xml>
+            <fieldNames>false</fieldNames>
+            <responseHeaders>false</responseHeaders>
+            <requestHeaders>false</requestHeaders>
+            <responseDataOnError>false</responseDataOnError>
+            <saveAssertionResultsFailureMessage>false</saveAssertionResultsFailureMessage>
+            <assertionsResultsToSave>0</assertionsResultsToSave>
+            <bytes>true</bytes>
+            <sampleCount>true</sampleCount>
+          </value>
+        </objProp>
+        <stringProp name="filename">${__property(user.dir)}${__BeanShell(File.separator,)}summary_${__P(nodes,01)}_${__P(threads)}.csv</stringProp>
+      </ResultCollector>
+      <hashTree/>
+    </hashTree>
+  </hashTree>
+</jmeterTestPlan>
