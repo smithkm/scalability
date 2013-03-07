@@ -1,0 +1,3 @@
+select * from planet_osm_line where name like 'Vancouver%' limit 4;
+select * from planet_osm_point where name like 'Vancouver%' limit 1;
+select * from planet_osm_line where name like 'Ottawa%' limit 2;
