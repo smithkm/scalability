@@ -23,4 +23,8 @@ else
   exit 1
 fi
 
-jmeter -p ../jmeter.properties -t ${SERVICE}.jmx -Jnodes=${NODES} -Jthreads=${THREADS} -Jloops=${LOOPS} -Jbboxes=${SRS}_${ZOOM} -Jsrs=${SRS} -Jheight=256 -Jwidth=256 -Jlayer=${TEST} -Jserver=$5 -Jport=$6
+# force some activity so GeoServer isn't starting cold
+jmeter -p ../jmeter.properties -n -t ${SERVICE}.jmx -Jnodes=xxx      -Jthreads=1          -Jloops=5        -Jbboxes=${SRS}_${ZOOM} -Jsrs=${SRS} -Jheight=256 -Jwidth=256 -Jlayer=${TEST} -Jserver=$5 -Jport=$6
+rm summary_xxx_*.csv
+
+jmeter -p ../jmeter.properties -n -t ${SERVICE}.jmx -Jnodes=${NODES} -Jthreads=${THREADS} -Jloops=${LOOPS} -Jbboxes=${SRS}_${ZOOM} -Jsrs=${SRS} -Jheight=256 -Jwidth=256 -Jlayer=${TEST} -Jserver=$5 -Jport=$6
